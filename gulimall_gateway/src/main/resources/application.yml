@@ -1,0 +1,24 @@
+#以下配置全部是从nacos配置中心读取的
+
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true  #开启从注册中心动态创建路由的功能，利用微服务名进行路由
+      routes: #路由路径精确的要向前放
+        - id: gulimall-product
+          uri: lb://gulimall-product  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Path=/api/product/**   #断言,路径相匹配的进行路由
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment}  #重写路径
+
+        - id: admin-route
+          uri: lb://renern-fast   #renren-fast服务
+          predicates:
+            - Path=/api/**   #前端项目发起的请求单独带api路径则直接路由到renern-fast
+          filters:
+            - RewritePath=/api/(?<segment>.*), /renren-fast/$\{segment}  #重写路径带上/renren-fast
+

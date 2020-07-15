@@ -1,0 +1,38 @@
+package gulimall.product.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import gulimall.common.utils.PageUtils;
+import gulimall.product.entity.CategoryEntity;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 商品三级分类
+ *
+ * @author SunQiXin
+ * @email 15153869872@163.com
+ * @date 2020-07-13 10:33:31
+ */
+public interface CategoryService extends IService<CategoryEntity> {
+
+    /**
+     * 分页查询
+     * @param params
+     * @return
+     */
+    PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 查询所有分类以及子分类，以树形列表展示
+     * @return
+     */
+    List<CategoryEntity> listWithTree();
+
+    /**
+     * 删除时需要查看是否有其他地方使用它
+     * @param asList
+     */
+    void removeMenuByIds(List<Long> asList);
+}
+
