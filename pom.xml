@@ -27,6 +27,7 @@
         <module>renren-generator</module>
         <module>gulimall-common</module>
         <module>gulimall_gateway</module>
+        <module>gulimall-third-party</module>
     </modules>
 
     <!--统一管理jar包版本-->
@@ -64,6 +65,18 @@
                 <version>${spring.cloud.alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.alibaba.nacos</groupId>
+                        <artifactId>nacos-client</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--重新指定nacos-client的版本,低版本会出现连接超时等错误虽然不影响使用-->
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>1.2.1</version>
             </dependency>
 
             <!--MySQL驱动-->
