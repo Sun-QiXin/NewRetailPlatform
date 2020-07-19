@@ -1,9 +1,10 @@
 package gulimall.product.service.impl;
 
+import gulimall.product.service.CategoryBrandRelationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -15,6 +16,7 @@ import gulimall.common.utils.Query;
 import gulimall.product.dao.CategoryDao;
 import gulimall.product.entity.CategoryEntity;
 import gulimall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -22,6 +24,8 @@ import gulimall.product.service.CategoryService;
  */
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+    @Autowired
+    private CategoryBrandRelationService categoryBrandRelationService;
 
     /**
      * 分页查询
@@ -64,17 +68,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
-     * 删除时需要查看是否有其他地方使用它
-     *
-     * @param asList
-     */
-    @Override
-    public void removeMenuByIds(List<Long> asList) {
-        //TODO 删除时需要查看是否有其他地方使用它
-        baseMapper.deleteBatchIds(asList);
-    }
-
-    /**
      * 递归查找每个主菜单的子菜单
      *
      * @param root 当前主菜单
@@ -95,4 +88,55 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return children;
     }
 
+    /**
+     * 删除时需要查看是否有其他地方使用它
+     *
+     * @param asList
+     */
+    @Override
+    public void removeMenuByIds(List<Long> asList) {
+        //TODO 删除时需要查看是否有其他地方使用它
+        baseMapper.deleteBatchIds(asList);
+    }
+
+    /**
+     * 根据id查询整个分类的完整路径【父/子/孙】
+     *
+     * @param catelogId
+     * @return
+     */
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        List<Long> paths = new ArrayList<>();
+        //调用方法
+        paths = findParentPath(catelogId, paths);
+        Collections.reverse(paths);
+        return paths.toArray(new Long[paths.size()]);
+    }
+    /**
+     * @param catelogId
+     * @param paths
+     * @return
+     */
+    private List<Long> findParentPath(Long catelogId, List<Long> paths) {
+        //1、收集当前节点id
+        paths.add(catelogId);
+        CategoryEntity categoryEntity = this.getById(catelogId);
+        if (categoryEntity.getParentCid() != 0) {
+            findParentPath(categoryEntity.getParentCid(),paths);
+        }
+        return paths;
+    }
+
+    /**
+     * 级联更新所有关联数据
+     *
+     * @param category
+     */
+    @Transactional(rollbackFor=Exception.class)
+    @Override
+    public void updateCascade(CategoryEntity category) {
+        this.updateById(category);
+        categoryBrandRelationService.updateCategory(category.getCatId(),category.getName());
+    }
 }
