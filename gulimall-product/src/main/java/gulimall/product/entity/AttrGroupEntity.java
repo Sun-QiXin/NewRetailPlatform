@@ -1,5 +1,6 @@
 package gulimall.product.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -9,7 +10,7 @@ import lombok.Data;
 
 /**
  * 属性分组
- * 
+ *
  * @author SunQiXin
  * @email 15153869872@163.com
  * @date 2020-07-13 10:33:30
@@ -44,5 +45,11 @@ public class AttrGroupEntity implements Serializable {
 	 * 所属分类id
 	 */
 	private Long catelogId;
+
+    /**
+     *分类的完整路径用于回显
+     */
+    @TableField(exist = false)
+	private Long[] catelogPath;
 
 }

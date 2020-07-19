@@ -52,14 +52,6 @@
             <version>4.4.13</version>
         </dependency>
 
-        <!--热部署依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-
         <!-- 数据校验所用依赖 -->
         <dependency>
             <groupId>javax.validation</groupId>
