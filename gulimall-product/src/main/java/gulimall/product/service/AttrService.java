@@ -43,6 +43,7 @@ public interface AttrService extends IService<AttrEntity> {
 
     /**
      * 修改规格参数
+     *
      * @param attr
      */
     void updateAttr(AttrVo attr);

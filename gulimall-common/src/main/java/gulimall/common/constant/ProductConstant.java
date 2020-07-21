@@ -1,4 +1,4 @@
-package gulimall.constant;
+package gulimall.common.constant;
 
 /**
  * 商品系统常量定义

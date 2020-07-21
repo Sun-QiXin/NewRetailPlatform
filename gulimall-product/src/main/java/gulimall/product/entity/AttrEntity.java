@@ -9,7 +9,7 @@ import lombok.Data;
 
 /**
  * 商品属性
- * 
+ *
  * @author SunQiXin
  * @email 15153869872@163.com
  * @date 2020-07-13 10:33:31
@@ -56,5 +56,9 @@ public class AttrEntity implements Serializable {
 	 * 快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整
 	 */
 	private Integer showDesc;
+    /**
+     * 值类型，多选单选
+     */
+	private Integer valueType;
 
 }
