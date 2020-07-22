@@ -23,9 +23,16 @@ spring:
             - RewritePath=/api/thirdparty/(?<segment>.*), /$\{segment}  #重写路径
 
         - id: gulimall-member
-          uri: lb://gulimall-member   #renren-fast服务
+          uri: lb://gulimall-member   #gulimall-member服务
           predicates:
             - Path=/api/member/**   #前端项目发起的请求单独带api路径
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment}  #重写路径
+
+        - id: gulimall-ware
+          uri: lb://gulimall-ware   #gulimall-ware服务
+          predicates:
+            - Path=/api/ware/**   #前端项目发起的请求单独带api路径
           filters:
             - RewritePath=/api/(?<segment>.*), /$\{segment}  #重写路径
 
