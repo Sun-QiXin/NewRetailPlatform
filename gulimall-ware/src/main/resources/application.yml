@@ -9,6 +9,8 @@ spring:
     username: root
     password: 362623
     url: jdbc:mysql://192.168.200.131:3306/gulimall_wms?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 
 #配置mybatis-plus
 mybatis-plus:

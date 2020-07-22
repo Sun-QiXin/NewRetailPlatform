@@ -7,7 +7,7 @@ import gulimall.ware.entity.PurchaseDetailEntity;
 import java.util.Map;
 
 /**
- * 
+ *
  *
  * @author SunQiXin
  * @email 15153869872@163.com
@@ -15,6 +15,11 @@ import java.util.Map;
  */
 public interface PurchaseDetailService extends IService<PurchaseDetailEntity> {
 
+    /**
+     * 分页查询并且带条件的模糊查询
+     * @param params
+     * @return
+     */
     PageUtils queryPage(Map<String, Object> params);
 }
 
