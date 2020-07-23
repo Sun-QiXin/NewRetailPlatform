@@ -4,8 +4,8 @@
 spring:
   cloud:
     alicloud:
-      access-key: LTAI4G54hfpNXrx3vFNEPtm9  #生成的Accesskey子用户信息
-      secret-key: F9reY09hSuIwPfSyQgQdZbPNtA6zHH
+      access-key: *  #生成的Accesskey子用户信息
+      secret-key: *
       oss:
         endpoint: oss-cn-qingdao.aliyuncs.com  #开通的oss服务的外网访问地址
         bucket: sunqixin-gulimal  #自定义的配置
