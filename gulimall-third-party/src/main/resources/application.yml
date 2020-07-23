@@ -1,0 +1,11 @@
+#以下配置全部是从nacos配置中心读取的
+
+
+spring:
+  cloud:
+    alicloud:
+      access-key: *  #生成的Accesskey子用户信息
+      secret-key: *
+      oss:
+        endpoint: *  #开通的oss服务的外网访问地址
+        bucket: sunqixin-gulimal  #自定义的配置
