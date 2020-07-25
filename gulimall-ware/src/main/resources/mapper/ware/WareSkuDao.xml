@@ -20,5 +20,11 @@
         WHERE sku_id = #{skuId} AND ware_id = #{wareId};
     </update>
 
-
+    <!--查询当前sku的库存量-->
+    <select id="getSkuStock" resultType="java.lang.Long">
+        SELECT SUM(stock-stock_locked) FROM wms_ware_sku
+        <where>
+            sku_id = #{skuId}
+        </where>
+    </select>
 </mapper>

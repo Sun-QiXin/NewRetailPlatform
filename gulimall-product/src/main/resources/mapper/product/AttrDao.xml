@@ -15,6 +15,15 @@
         <result property="catelogId" column="catelog_id"/>
         <result property="showDesc" column="show_desc"/>
     </resultMap>
-
-
+    <!--取出当前id集合中可以被检索的id集合-->
+    <select id="selectSearchAttrIds" resultType="java.lang.Long">
+        SELECT attr_id FROM pms_attr
+        <where>
+            attr_id IN
+            <foreach collection="attrValueIds" open="(" item="id" separator="," close=")">
+                #{id}
+            </foreach>
+            AND search_type = 1
+        </where>
+    </select>
 </mapper>

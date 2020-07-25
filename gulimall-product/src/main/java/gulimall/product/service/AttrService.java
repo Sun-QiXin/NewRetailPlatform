@@ -68,5 +68,12 @@ public interface AttrService extends IService<AttrEntity> {
      * @return
      */
     PageUtils getNoAttrRelation(Map<String, Object> params, Long attrgroupId);
+
+    /**
+     * 取出当前id集合中可以被检索的id集合
+     * @param attrValueIds
+     * @return
+     */
+    List<Long> selectSearchAttrIds(List<Long> attrValueIds);
 }
 
