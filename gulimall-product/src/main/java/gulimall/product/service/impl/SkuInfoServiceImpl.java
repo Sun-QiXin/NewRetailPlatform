@@ -3,6 +3,7 @@ package gulimall.product.service.impl;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -71,5 +72,17 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    /**
+     * 查出当前spuId对应的所有sku信息，品牌的名字。
+     *
+     * @param spuId
+     * @return
+     */
+    @Override
+    public List<SkuInfoEntity> getSkusBySpuId(Long spuId) {
+        List<SkuInfoEntity> skuInfoEntities = this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
+        return skuInfoEntities;
     }
 }
