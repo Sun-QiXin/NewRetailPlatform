@@ -1,5 +1,6 @@
 package gulimall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.sun.xml.internal.bind.v2.TODO;
 import gulimall.common.constant.ProductConstant;
 import gulimall.common.to.SkuReductionTo;
@@ -267,8 +268,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //2.2 发送远程调用，库存系统查询是否有库存
         Map<Long, Boolean> skuHasStockMap = null;
         try {
-            R<List<SkuHasStockVo>> skuHasStock = wareFeignService.getSkuHasStock(skuIds);
-            skuHasStockMap = skuHasStock.getData().stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, SkuHasStockVo::getHasStock));
+            R r = wareFeignService.getSkuHasStock(skuIds);
+            TypeReference<List<SkuHasStockVo>> typeReference = new TypeReference<List<SkuHasStockVo>>() {
+            };
+            skuHasStockMap = r.getData(typeReference).stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, SkuHasStockVo::getHasStock));
         } catch (Exception e) {
             log.error("库存查询异常！：原因{}" + e);
         }

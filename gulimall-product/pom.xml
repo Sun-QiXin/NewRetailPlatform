@@ -30,6 +30,12 @@
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>-->
 
+        <!--thymeleaf模板引擎-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <!--SpringCloud集成openfeign服务调用起步依赖-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

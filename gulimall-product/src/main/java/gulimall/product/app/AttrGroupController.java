@@ -1,17 +1,15 @@
-package gulimall.product.controller;
+package gulimall.product.app;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import gulimall.product.entity.AttrAttrgroupRelationEntity;
 import gulimall.product.entity.AttrEntity;
 import gulimall.product.service.AttrAttrgroupRelationService;
 import gulimall.product.service.AttrService;
 import gulimall.product.service.CategoryService;
 import gulimall.product.vo.AttrGroupRelationVo;
 import gulimall.product.vo.AttrGroupWithAttrsVo;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

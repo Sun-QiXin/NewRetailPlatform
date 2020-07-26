@@ -42,3 +42,8 @@ spring:
             - Path=/api/**   #前端项目发起的请求只带带api路径则默认路由到renern-fast
           filters:
             - RewritePath=/api/(?<segment>.*), /renren-fast/$\{segment}  #重写路径带上/renren-fast
+
+        - id: gulimall-host
+          uri: lb://gulimall-product  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=192.168.200.199  #根据请求头传送的host进行路由

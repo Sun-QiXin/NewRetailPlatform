@@ -1,6 +1,7 @@
 package gulimall.product.service.impl;
 
 import gulimall.product.service.CategoryBrandRelationService;
+import gulimall.product.vo.catagory2Vo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -113,6 +114,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         Collections.reverse(paths);
         return paths.toArray(new Long[paths.size()]);
     }
+
     /**
      * @param catelogId
      * @param paths
@@ -123,7 +125,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         paths.add(catelogId);
         CategoryEntity categoryEntity = this.getById(catelogId);
         if (categoryEntity.getParentCid() != 0) {
-            findParentPath(categoryEntity.getParentCid(),paths);
+            findParentPath(categoryEntity.getParentCid(), paths);
         }
         return paths;
     }
@@ -133,10 +135,76 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * @param category
      */
-    @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateCascade(CategoryEntity category) {
         this.updateById(category);
-        categoryBrandRelationService.updateCategory(category.getCatId(),category.getName());
+        categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
+    }
+
+    /**
+     * 查出所有的1级分类
+     *
+     * @return
+     */
+    @Override
+    public List<CategoryEntity> getLeve1Categorys() {
+        List<CategoryEntity> categoryEntities = this.list(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+        return categoryEntities;
+    }
+
+    /**
+     * 获取2级3级分类的json
+     *
+     * @return
+     */
+    @Override
+    public Map<String, List<catagory2Vo>> getCatalogJson() {
+        //1、查出所有分类及子分类
+        List<CategoryEntity> categoryEntityList = this.list();
+
+        //所有的1级菜单
+        List<CategoryEntity> leve1Categorys = getParent_cid(categoryEntityList, 0L);
+
+        //2、封装数据
+        Map<String, List<catagory2Vo>> collect = leve1Categorys.stream().collect(Collectors.toMap(key -> key.getCatId().toString()
+                , value -> {
+                    //查出这个1级分类的二级分类
+                    List<CategoryEntity> category2Entities = getParent_cid(categoryEntityList, value.getCatId());
+                    //封装上面的结果
+                    List<catagory2Vo> catagory2Vos = null;
+                    if (category2Entities != null && category2Entities.size() > 0) {
+                        catagory2Vos = category2Entities.stream().map(category2Entity -> {
+                            //找到当前遍历二级分类的三级分类信息
+                            List<CategoryEntity> category3Entities = getParent_cid(categoryEntityList, category2Entity.getCatId());
+                            List<catagory2Vo.catalog3Vo> catalog3Vos = null;
+                            if (category3Entities != null && category3Entities.size() > 0) {
+                                //封装成catalog3Vo
+                                catalog3Vos = category3Entities.stream().map(category3Entity -> {
+                                    catagory2Vo.catalog3Vo catalog3Vo = new catagory2Vo.catalog3Vo(category2Entity.getCatId().toString(), category3Entity.getCatId(), category3Entity.getName());
+                                    return catalog3Vo;
+                                }).collect(Collectors.toList());
+                            }
+
+                            //封装成catagory2Vo
+                            catagory2Vo catagory2Vo = new catagory2Vo(value.getCatId().toString(), catalog3Vos, category2Entity.getCatId(), category2Entity.getName());
+                            return catagory2Vo;
+                        }).collect(Collectors.toList());
+                    }
+                    return catagory2Vos;
+                }));
+        return collect;
+    }
+
+    /**
+     * 从集合中找出parent_cid等于指定的id的菜单
+     *
+     * @param categoryEntityList
+     * @param parent_cid
+     * @return
+     */
+    private List<CategoryEntity> getParent_cid(List<CategoryEntity> categoryEntityList, Long parent_cid) {
+        List<CategoryEntity> collect = categoryEntityList.stream().filter(item -> item.getParentCid().equals(parent_cid)).collect(Collectors.toList());
+        return collect;
     }
 }
