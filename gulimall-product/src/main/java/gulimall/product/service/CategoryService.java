@@ -3,6 +3,7 @@ package gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import gulimall.common.utils.PageUtils;
 import gulimall.product.entity.CategoryEntity;
+import gulimall.product.vo.catagory2Vo;
 
 import java.util.List;
 import java.util.Map;
@@ -47,5 +48,17 @@ public interface CategoryService extends IService<CategoryEntity> {
      * @param category
      */
     void updateCascade(CategoryEntity category);
+
+    /**
+     * 查出所有的1级分类
+     * @return
+     */
+    List<CategoryEntity> getLeve1Categorys();
+
+    /**
+     * 获取2级3级分类的json
+     * @return
+     */
+    Map<String, List<catagory2Vo>> getCatalogJson();
 }
 

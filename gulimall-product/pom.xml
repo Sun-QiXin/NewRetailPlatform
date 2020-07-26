@@ -24,6 +24,18 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!--阿里云的对象存储原生的-->
+        <!--<dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+        </dependency>-->
+
+        <!--thymeleaf模板引擎-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <!--SpringCloud集成openfeign服务调用起步依赖-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -53,10 +65,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 

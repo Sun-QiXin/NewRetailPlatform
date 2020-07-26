@@ -1,4 +1,4 @@
-package gulimall.product.controller;
+package gulimall.product.app;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,13 +9,8 @@ import gulimall.product.service.ProductAttrValueService;
 import gulimall.product.vo.AttrRespVo;
 import gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import gulimall.product.entity.AttrEntity;
 import gulimall.product.service.AttrService;
 import gulimall.common.utils.PageUtils;
 import gulimall.common.utils.R;
@@ -110,5 +105,4 @@ public class AttrController {
 
         return R.ok();
     }
-
 }

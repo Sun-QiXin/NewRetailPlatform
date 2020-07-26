@@ -18,6 +18,10 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss #指定返回日期的格式
 
+    #关闭页面缓存
+  thymeleaf:
+    cache: false
+
 #配置mybatis-plus
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml  #mapper文件位置
