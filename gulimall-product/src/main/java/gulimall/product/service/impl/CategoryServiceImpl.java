@@ -1,11 +1,18 @@
 package gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import gulimall.product.service.CategoryBrandRelationService;
 import gulimall.product.vo.catagory2Vo;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,6 +25,7 @@ import gulimall.product.dao.CategoryDao;
 import gulimall.product.entity.CategoryEntity;
 import gulimall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -27,6 +35,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     /**
      * 分页查询
@@ -154,46 +168,113 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
-     * 获取2级3级分类的json
+     * <br>获取2级3级分类的json，加入redis缓存
+     * <br>TODO 压力测试时会出现OutOfMemoryError 堆外内存溢出
+     * <br>1)、springboot2.o以后默认使用Lettuce作为操作redis的客户端。它使用netty进行网络通信。
+     * <br>2).lettuce的bug导致netty堆外内存溢出-Xmx300m; netty如果没有指定堆外内存，默认使用-Xmx300m
+     * <br>可以通过-Dio.netty.maxDirectMemory进行设置
+     * <br>解决方案:不能使用-Dio.netty.maxDirectMemory只去调大堆外内存,这样只会延缓出现的时间
+     * <br>1)、升级Lettuce客户端。
+     * <br>2）、切换使用jedis
      *
      * @return
      */
     @Override
     public Map<String, List<catagory2Vo>> getCatalogJson() {
-        //1、查出所有分类及子分类
-        List<CategoryEntity> categoryEntityList = this.list();
+        String catalogJson = stringRedisTemplate.opsForValue().get("catalogJson");
 
-        //所有的1级菜单
-        List<CategoryEntity> leve1Categorys = getParent_cid(categoryEntityList, 0L);
+        if (StringUtils.isEmpty(catalogJson)) {
+            //1、缓存中没有，查询数据库
+            Map<String, List<catagory2Vo>> catalogJsonFromDb = getCatalogJsonFromDb();
+            return catalogJsonFromDb;
+        }
 
-        //2、封装数据
-        Map<String, List<catagory2Vo>> collect = leve1Categorys.stream().collect(Collectors.toMap(key -> key.getCatId().toString()
-                , value -> {
-                    //查出这个1级分类的二级分类
-                    List<CategoryEntity> category2Entities = getParent_cid(categoryEntityList, value.getCatId());
-                    //封装上面的结果
-                    List<catagory2Vo> catagory2Vos = null;
-                    if (category2Entities != null && category2Entities.size() > 0) {
-                        catagory2Vos = category2Entities.stream().map(category2Entity -> {
-                            //找到当前遍历二级分类的三级分类信息
-                            List<CategoryEntity> category3Entities = getParent_cid(categoryEntityList, category2Entity.getCatId());
-                            List<catagory2Vo.catalog3Vo> catalog3Vos = null;
-                            if (category3Entities != null && category3Entities.size() > 0) {
-                                //封装成catalog3Vo
-                                catalog3Vos = category3Entities.stream().map(category3Entity -> {
-                                    catagory2Vo.catalog3Vo catalog3Vo = new catagory2Vo.catalog3Vo(category2Entity.getCatId().toString(), category3Entity.getCatId(), category3Entity.getName());
-                                    return catalog3Vo;
-                                }).collect(Collectors.toList());
-                            }
+        //2、将json字符串转换为我们要用的对象
+        Map<String, List<catagory2Vo>> result = JSON.parseObject(catalogJson, new TypeReference<Map<String, List<catagory2Vo>>>() {
+        });
+        return result;
+    }
 
-                            //封装成catagory2Vo
-                            catagory2Vo catagory2Vo = new catagory2Vo(value.getCatId().toString(), catalog3Vos, category2Entity.getCatId(), category2Entity.getName());
-                            return catagory2Vo;
-                        }).collect(Collectors.toList());
-                    }
-                    return catagory2Vos;
-                }));
-        return collect;
+    /**
+     * <br>从数据库获取2级3级分类的json
+     * <br>只要是同一把锁，就能锁住需要这个锁的所有线程
+     * <br>1、synchronized (this):SpringBoot所有的组件在容器中都是单例的。
+     * <br>2、本地锁:synchronized，uc(Lock)，在分布式情况下，想要锁住所有，必须使用分布式锁
+     * <br> setIfAbsent就是SET NX，设置之前会查看有没有，没有才会保存成功（保存成功表示得到锁）
+     *
+     * <br> 最终我们使用redisson提供的分布式锁
+     * <br>//1)、不指定过期时间会自动续期，如果业务超长，运行期间自动给锁续上新的30s。不用担心业务时间长，锁自动过期被删掉
+     * //2)、加锁的业务只要运行完成，就不会给当前锁续期，即使不手动解锁，锁默认在30s以后自动删除。
+     *
+     * @return
+     */
+    public Map<String, List<catagory2Vo>> getCatalogJsonFromDb() {
+        //一、获取一把锁，只要锁的名字一样，就是同一把锁
+        RLock lock = redissonClient.getLock("catalogJsonLock");
+        //二、阻塞式等待。默认加的锁都是30s时间。
+        //{1}、加锁:解决缓存击穿,指定过期时间后就不会给当前锁续期
+        lock.lock(30, TimeUnit.SECONDS);
+        try {
+            //得到锁以后,我们应该再去缓存中确定一次，如果没有才需要继续查询
+            String catalogJson = stringRedisTemplate.opsForValue().get("catalogJson");
+            if (!StringUtils.isEmpty(catalogJson)) {
+                //如果不为空那就直接返回缓存数据
+                Map<String, List<catagory2Vo>> result = JSON.parseObject(catalogJson, new TypeReference<Map<String, List<catagory2Vo>>>() {
+                });
+                return result;
+            }
+            //System.out.println("查询数据库~");
+
+            //1、查出所有分类及子分类
+            List<CategoryEntity> categoryEntityList = this.list();
+
+            //所有的1级菜单
+            List<CategoryEntity> leve1Categorys = getParent_cid(categoryEntityList, 0L);
+
+            //2、封装数据
+            Map<String, List<catagory2Vo>> collect = leve1Categorys.stream().collect(Collectors.toMap(key -> key.getCatId().toString()
+                    , value -> {
+                        //查出这个1级分类的二级分类
+                        List<CategoryEntity> category2Entities = getParent_cid(categoryEntityList, value.getCatId());
+                        //封装上面的结果
+                        List<catagory2Vo> catagory2Vos = null;
+                        if (category2Entities != null && category2Entities.size() > 0) {
+                            catagory2Vos = category2Entities.stream().map(category2Entity -> {
+                                //找到当前遍历二级分类的三级分类信息
+                                List<CategoryEntity> category3Entities = getParent_cid(categoryEntityList, category2Entity.getCatId());
+                                List<catagory2Vo.catalog3Vo> catalog3Vos = null;
+                                if (category3Entities != null && category3Entities.size() > 0) {
+                                    //封装成catalog3Vo
+                                    catalog3Vos = category3Entities.stream().map(category3Entity -> {
+                                        catagory2Vo.catalog3Vo catalog3Vo = new catagory2Vo.catalog3Vo(category2Entity.getCatId().toString(), category3Entity.getCatId(), category3Entity.getName());
+                                        return catalog3Vo;
+                                    }).collect(Collectors.toList());
+                                }
+
+                                //封装成catagory2Vo
+                                catagory2Vo catagory2Vo = new catagory2Vo(value.getCatId().toString(), catalog3Vos, category2Entity.getCatId(), category2Entity.getName());
+                                return catagory2Vo;
+                            }).collect(Collectors.toList());
+                        }
+                        return catagory2Vos;
+                    }));
+
+            //查到的数据转为json字符串放入缓存
+            String jsonString = JSON.toJSONString(collect);
+            if (StringUtils.isEmpty(jsonString)) {
+                //{2}、空结果缓存:解诀缓存穿透
+                stringRedisTemplate.opsForValue().set("catalogJson", "0", 3, TimeUnit.MINUTES);
+            } else {
+                //{3}设置过期时间（加随机值）:解决缓存雪崩
+                stringRedisTemplate.opsForValue().set("catalogJson", jsonString, 1, TimeUnit.DAYS);
+            }
+
+            return collect;
+        } finally {
+            //解锁
+            lock.unlock();
+            //System.out.println("删除分布式锁成功");
+        }
     }
 
     /**

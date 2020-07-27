@@ -30,6 +30,19 @@
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>-->
 
+        <!--使用redisson作为所有分布式锁，分布式对象等功能框架-->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.13.0</version>
+        </dependency>
+
+        <!--SpringBoot集成redis-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!--thymeleaf模板引擎-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
