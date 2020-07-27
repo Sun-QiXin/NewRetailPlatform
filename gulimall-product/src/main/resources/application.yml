@@ -18,7 +18,11 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss #指定返回日期的格式
 
-    #关闭页面缓存
+  redis:  #配置redis
+    host: 192.168.200.132
+    port: 6379
+
+  #关闭页面缓存
   thymeleaf:
     cache: false
 

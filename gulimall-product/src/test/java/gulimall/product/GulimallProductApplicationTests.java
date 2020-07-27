@@ -1,20 +1,12 @@
 package gulimall.product;
 
-import gulimall.product.entity.BrandEntity;
-import gulimall.product.service.AttrGroupService;
-import gulimall.product.service.BrandService;
 
-import gulimall.product.service.CategoryService;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import javax.annotation.Resource;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import java.util.UUID;
 
 /**
  * 使用阿里云的对象存储步骤
@@ -26,13 +18,29 @@ import java.util.List;
 class GulimallProductApplicationTests {
 
     @Autowired
-    private BrandService brandService;
-    @Autowired
-    private CategoryService categoryService;
+    private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
+    /**
+     * 测试redis
+     */
     @Test
-    void contextLoads() {
-        Long[] path = categoryService.findCatelogPath(225L);
-        System.out.println(Arrays.toString(path));
+    void testRedis() {
+        //保存
+        redisTemplate.opsForValue().set("hello", "word_"+ UUID.randomUUID().toString());
+
+        //查询
+        String s = redisTemplate.opsForValue().get("hello");
+        System.out.println(s);
+    }
+
+    /**
+     * 测试Redisson
+     */
+    @Test
+    void testRedisson() {
+        System.out.println(redissonClient);
     }
 }
