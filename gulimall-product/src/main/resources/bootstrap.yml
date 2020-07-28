@@ -30,3 +30,6 @@ spring:
           - data-id: redis.yaml
             group: dev
             refresh: true
+          - data-id: SpringCache.yaml
+            group: dev
+            refresh: true
