@@ -43,7 +43,12 @@ spring:
           filters:
             - RewritePath=/api/(?<segment>.*), /renren-fast/$\{segment}  #重写路径带上/renren-fast
 
-        - id: gulimall-host
+        - id: gulimall-product-host
           uri: lb://gulimall-product  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
           predicates:
-            - Host=192.168.200.199  #根据请求头传送的host进行路由
+            - Host=gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-search-host
+          uri: lb://gulimall-search  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=search.gulimall.com  #根据请求头传送的host进行路由

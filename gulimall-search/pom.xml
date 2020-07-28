@@ -24,6 +24,12 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!--thymeleaf模板引擎-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <!--elasticsearch的高阶依赖-->
         <dependency>
             <groupId>org.elasticsearch.client</groupId>

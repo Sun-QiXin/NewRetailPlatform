@@ -3,6 +3,7 @@ package gulimall.product.vo;
 import gulimall.product.entity.AttrEntity;
 import gulimall.product.entity.AttrGroupEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * <br>Date: 2020/07/21 09:44:53
  */
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class AttrGroupWithAttrsVo extends AttrGroupEntity {
     /**
      * 属性列表

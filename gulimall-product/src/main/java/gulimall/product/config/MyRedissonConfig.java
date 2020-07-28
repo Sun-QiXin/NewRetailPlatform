@@ -3,6 +3,7 @@ package gulimall.product.config;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.redisson.spring.session.config.EnableRedissonHttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +16,7 @@ import java.io.IOException;
  * <br>Date: 2020/07/27 11:59:06
  */
 @Configuration
-public class RedissonConfig {
+public class MyRedissonConfig {
     /**
      * 所有对Redisson的使用都是通过RedissonClient对象
      * @return

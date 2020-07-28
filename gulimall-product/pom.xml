@@ -30,6 +30,12 @@
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>-->
 
+        <!--SpringBoot集成cache缓存-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
         <!--使用redisson作为所有分布式锁，分布式对象等功能框架-->
         <dependency>
             <groupId>org.redisson</groupId>

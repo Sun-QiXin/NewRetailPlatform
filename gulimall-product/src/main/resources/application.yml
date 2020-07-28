@@ -17,14 +17,19 @@ spring:
         #endpoint: http://oss-cn-qingdao.aliyuncs.com  #开通的oss服务的外网访问地址
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss #指定返回日期的格式
-
   redis:  #配置redis
     host: 192.168.200.132
     port: 6379
+  cache:
+    type: redis #配置使用redis作为缓存
+    redis:
+      time-to-live: 3600000 #设置1个小时的存活时间
+      key-prefix: SpringCache_  #每个缓存空间的前缀
+      use-key-prefix: true  #是否使用缓存前缀
+      cache-null-values: true   #是否使用缓存空值，防止缓存穿透
 
-  #关闭页面缓存
   thymeleaf:
-    cache: false
+    cache: false #关闭页面缓存
 
 #配置mybatis-plus
 mybatis-plus:

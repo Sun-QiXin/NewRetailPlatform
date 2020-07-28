@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 /**
- * 分页插件
+ * MybatisPlus自定义配置
  * @author x3626
  */
 @EnableTransactionManagement
@@ -17,6 +17,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan("gulimall.product.dao")
 public class MybatisPlusConfig {
 
+    /**
+     * 使用分页插件
+     * @return
+     */
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
