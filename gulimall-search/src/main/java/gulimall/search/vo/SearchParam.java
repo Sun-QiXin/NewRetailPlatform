@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * 封装页面所有可能传递的检索条件
+ *
  * @author 孙启新
  * <br>FileName: SearchParam
  * <br>Date: 2020/07/28 13:32:25
@@ -50,5 +51,5 @@ public class SearchParam {
     /**
      * 页码
      */
-    private Integer pageNum;
+    private Integer pageNum = 1;
 }
