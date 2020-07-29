@@ -1,0 +1,183 @@
+/*模糊匹配，过滤（按照属性，分类，品牌，价格区间，库存），排序，分页，高亮，聚合分析*/
+/*GET /gulimall_product/_search*/
+{
+  "from": 0,
+  "size": 2,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "skuTitle": {
+              "query": "华为"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "term": {
+            "catalogId": {
+              "value": 225
+            }
+          }
+        },
+        {
+          "nested": {
+            "query": {
+              "bool": {
+                "must": [
+                  {
+                    "term": {
+                      "attrs.attrId": {
+                        "value": "12"
+                      }
+                    }
+                  },
+                  {
+                    "terms": {
+                      "attrs.attrValue": [
+                        "2019"
+                      ]
+                    }
+                  }
+                ],
+                "adjust_pure_negative": true
+              }
+            },
+            "path": "attrs",
+            "ignore_unmapped": false,
+            "score_mode": "none"
+          }
+        },
+        {
+          "nested": {
+            "query": {
+              "bool": {
+                "must": [
+                  {
+                    "term": {
+                      "attrs.attrId": {
+                        "value": "11"
+                      }
+                    }
+                  },
+                  {
+                    "terms": {
+                      "attrs.attrValue": [
+                        "2K"
+                      ]
+                    }
+                  }
+                ],
+                "adjust_pure_negative": true
+              }
+            },
+            "path": "attrs",
+            "ignore_unmapped": false,
+            "score_mode": "none"
+          }
+        },
+        {
+          "term": {
+            "hasStock": {
+              "value": true
+            }
+          }
+        },
+        {
+          "range": {
+            "skuPrice": {
+              "from": "5000",
+              "to": "5700",
+              "include_lower": true,
+              "include_upper": true
+            }
+          }
+        }
+      ],
+      "adjust_pure_negative": true
+    }
+  },
+  "sort": [
+    {
+      "skuPrice": {
+        "order": "desc"
+      }
+    }
+  ],
+  "aggregations": {
+    "brand_agg": {
+      "terms": {
+        "field": "brandId",
+        "size": 50
+      },
+      "aggregations": {
+        "brand_name_agg": {
+          "terms": {
+            "field": "brandName",
+            "size": 10
+          }
+        },
+        "brand_img_agg": {
+          "terms": {
+            "field": "brandImg",
+            "size": 10
+          }
+        }
+      }
+    },
+    "catalog_agg": {
+      "terms": {
+        "field": "catalogId",
+        "size": 20
+      },
+      "aggregations": {
+        "catalog_name_agg": {
+          "terms": {
+            "field": "catalogName",
+            "size": 10
+          }
+        }
+      }
+    },
+    "attr_agg": {
+      "nested": {
+        "path": "attrs"
+      },
+      "aggregations": {
+        "attr_id_agg": {
+          "terms": {
+            "field": "attrs.attrId",
+            "size": 10
+          },
+          "aggregations": {
+            "attr_name_agg": {
+              "terms": {
+                "field": "attrs.attrName",
+                "size": 10
+              }
+            },
+            "attr_value_agg": {
+              "terms": {
+                "field": "attrs.attrValue",
+                "size": 10
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "highlight": {
+    "pre_tags": [
+      "<b style='color:red'>"
+    ],
+    "post_tags": [
+      "</b>"
+    ],
+    "fields": {
+      "skuTitle": {}
+    }
+  }
+}
