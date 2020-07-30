@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- * <p>
- * https://www.renren.io
- * <p>
- * 版权所有，侵权必究！
- */
-
 package gulimall.common.utils;
 
 import com.alibaba.fastjson.JSON;
@@ -26,8 +18,13 @@ public class R extends HashMap<String, Object> {
     public <T> T getData(TypeReference<T> typeReference){
         Object data = get("data");
         String s = JSON.toJSONString(data);
-        T t = JSON.parseObject(s, typeReference);
-        return t;
+        return JSON.parseObject(s, typeReference);
+    }
+
+    public <T> T getData(String key ,TypeReference<T> typeReference){
+        Object data = get(key);
+        String s = JSON.toJSONString(data);
+        return JSON.parseObject(s, typeReference);
     }
 
     public R setData(Object data) {

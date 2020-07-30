@@ -6,10 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 返回页面的vo
+ *
  * @author 孙启新
  * <br>FileName: SearchResponse
  * <br>Date: 2020/07/28 13:55:41
@@ -35,6 +37,10 @@ public class SearchResult {
      */
     private Integer totalPages;
     /**
+     * 存储页码
+     */
+    private List<Integer> pageNavs;
+    /**
      * 当前查询商品涉及到的品牌
      */
     private List<BrandVo> brands;
@@ -46,6 +52,11 @@ public class SearchResult {
      * 当前查询商品涉及到的分类
      */
     private List<CatalogVo> catalogs;
+    /**
+     * 面包屑导航数据
+     */
+    private List<navVo> navs = new ArrayList<>();
+    private List<Long> attrIds = new ArrayList<>();
 
     /**
      * 品牌信息VO
@@ -104,5 +115,26 @@ public class SearchResult {
          * 分类名称
          */
         private String catalogName;
+    }
+
+    /**
+     * 面包屑导航数据信息
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class navVo {
+        /**
+         * 导航名字
+         */
+        private String navName;
+        /**
+         * 导航值
+         */
+        private String navValue;
+        /**
+         * 跳转地址
+         */
+        private String link;
     }
 }

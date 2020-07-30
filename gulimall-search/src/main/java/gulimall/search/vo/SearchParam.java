@@ -30,7 +30,7 @@ public class SearchParam {
     private String sort;
     /**
      * 过滤条件是否有货
-     * hasStock(是否有货)、sluPrice区间、brandId、 cataLog3Id、attrs
+     * hasStock(是否有货)、sluPrice区间、brandId、 catalog3Id、attrs
      * hasStock=e/1
      * skuPrice=0_500/_500/500_
      * brandId=111
@@ -52,4 +52,8 @@ public class SearchParam {
      * 页码
      */
     private Integer pageNum = 1;
+    /**
+     * 请求参数
+     */
+    private String queryString;
 }

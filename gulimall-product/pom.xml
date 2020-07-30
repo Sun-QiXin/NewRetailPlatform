@@ -10,7 +10,6 @@
         <version>1.0.0</version>
     </parent>
 
-    <groupId>gulimall</groupId>
     <artifactId>gulimall-product</artifactId>
     <version>1.0.0</version>
     <name>gulimall-product</name>
