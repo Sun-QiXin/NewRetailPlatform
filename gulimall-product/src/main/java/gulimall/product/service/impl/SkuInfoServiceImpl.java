@@ -1,8 +1,21 @@
 package gulimall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import gulimall.common.to.SkuHasStockVo;
+import gulimall.common.utils.R;
+import gulimall.product.entity.SkuImagesEntity;
+import gulimall.product.entity.SpuInfoDescEntity;
+import gulimall.product.feign.WareFeignService;
+import gulimall.product.service.*;
+
+import gulimall.product.vo.SkuItemSaleAttrsVo;
+import gulimall.product.vo.SkuItemVo;
+import gulimall.product.vo.SpuItemBaseGroupAttrsVo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -14,11 +27,24 @@ import gulimall.common.utils.Query;
 
 import gulimall.product.dao.SkuInfoDao;
 import gulimall.product.entity.SkuInfoEntity;
-import gulimall.product.service.SkuInfoService;
 
 
 @Service("skuInfoService")
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> implements SkuInfoService {
+    @Autowired
+    private SkuImagesService skuImagesService;
+
+    @Autowired
+    private SpuInfoDescService spuInfoDescService;
+
+    @Autowired
+    private AttrGroupService attrGroupService;
+
+    @Autowired
+    private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Autowired
+    private WareFeignService wareFeignService;
 
     /**
      * sku的基本信息；pms_sku_info
@@ -82,7 +108,49 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
      */
     @Override
     public List<SkuInfoEntity> getSkusBySpuId(Long spuId) {
-        List<SkuInfoEntity> skuInfoEntities = this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
-        return skuInfoEntities;
+        return this.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
+    }
+
+    /**
+     * 根据skuId返回页面需要的商品数据
+     *
+     * @param skuId skuId
+     * @return 商品数据
+     */
+    @Override
+    public SkuItemVo itemSkuInfo(Long skuId) {
+        SkuItemVo skuItemVo = new SkuItemVo();
+        //1、sku基本信息获取   pms_sku_info
+        SkuInfoEntity skuInfoEntity = this.getById(skuId);
+        Long catalogId = skuInfoEntity.getCatalogId();
+        Long spuId = skuInfoEntity.getSpuId();
+        skuItemVo.setInfo(skuInfoEntity);
+
+        //2、sku的图片信息    pms_sku_images
+        List<SkuImagesEntity> skuImagesEntities = skuImagesService.getImagesById(skuId);
+        skuItemVo.setImages(skuImagesEntities);
+
+        //3、获取spu的销售属性组合。
+        List<SkuItemSaleAttrsVo> saleAttrsVos = skuSaleAttrValueService.getSaleAttrsBySpuId(spuId);
+        skuItemVo.setSaleAttrs(saleAttrsVos);
+
+        //4、获取spu的介绍 pms_spu_info_desc
+        SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(spuId);
+        skuItemVo.setDesp(spuInfoDescEntity);
+
+        //5、获取spu的规格参数信息。
+        List<SpuItemBaseGroupAttrsVo> groupAttrsVos = attrGroupService.getAttrGroupWithAttrsBySpuId(catalogId,spuId);
+        skuItemVo.setGroupAttrs(groupAttrsVos);
+
+        //6、远程查询当前商品是否有库存
+        R r = wareFeignService.getSkuHasStock(Collections.singletonList(skuId));
+        if (r.getCode()==0){
+            List<SkuHasStockVo> hasStockVos = r.getData(new TypeReference<List<SkuHasStockVo>>() {
+            });
+            for (SkuHasStockVo hasStockVo : hasStockVos) {
+                skuItemVo.setHasStock(hasStockVo.getHasStock());
+            }
+        }
+        return skuItemVo;
     }
 }

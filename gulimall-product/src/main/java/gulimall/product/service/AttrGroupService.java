@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import gulimall.common.utils.PageUtils;
 import gulimall.product.entity.AttrGroupEntity;
 import gulimall.product.vo.AttrGroupWithAttrsVo;
+import gulimall.product.vo.SpuItemBaseGroupAttrsVo;
 
 import java.util.List;
 import java.util.Map;
@@ -30,5 +31,13 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * @return
      */
     List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatlogId(Long catlogId);
+
+    /**
+     * 获取spu的规格参数信息
+     * @param catalogId
+     * @param spuId
+     * @return
+     */
+    List<SpuItemBaseGroupAttrsVo> getAttrGroupWithAttrsBySpuId(Long catalogId, Long spuId);
 }
 

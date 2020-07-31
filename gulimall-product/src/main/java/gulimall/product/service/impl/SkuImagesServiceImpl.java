@@ -1,7 +1,10 @@
 package gulimall.product.service.impl;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -26,4 +29,14 @@ public class SkuImagesServiceImpl extends ServiceImpl<SkuImagesDao, SkuImagesEnt
         return new PageUtils(page);
     }
 
+    /**
+     * 根据id获取所有图片
+     *
+     * @param skuId id
+     * @return 每个id的图片
+     */
+    @Override
+    public List<SkuImagesEntity> getImagesById(Long skuId) {
+        return this.list(new QueryWrapper<SkuImagesEntity>().eq("sku_id", skuId));
+    }
 }
