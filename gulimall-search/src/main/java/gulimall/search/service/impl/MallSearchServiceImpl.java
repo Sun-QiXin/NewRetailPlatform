@@ -14,7 +14,6 @@ import gulimall.search.vo.SearchParam;
 import gulimall.search.vo.SearchResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
-import org.bouncycastle.util.encoders.UTF8;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;

@@ -3,6 +3,7 @@ package gulimall.product.service.impl;
 import gulimall.product.entity.AttrEntity;
 import gulimall.product.service.AttrService;
 import gulimall.product.vo.AttrGroupWithAttrsVo;
+import gulimall.product.vo.SpuItemBaseGroupAttrsVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ import gulimall.product.entity.AttrGroupEntity;
 import gulimall.product.service.AttrGroupService;
 
 
+/**
+ * @author x3626
+ */
 @Service("attrGroupService")
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
     @Autowired
@@ -79,7 +83,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         List<AttrGroupEntity> attrGroupEntities = this.list(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catlogId));
 
         //2、查询所有属性
-        List<AttrGroupWithAttrsVo> attrGroupWithAttrsVos = attrGroupEntities.stream().map(attrGroupEntity -> {
+        return attrGroupEntities.stream().map(attrGroupEntity -> {
             AttrGroupWithAttrsVo attrGroupWithAttrsVo = new AttrGroupWithAttrsVo();
             //将基本数据拷贝进去
             BeanUtils.copyProperties(attrGroupEntity, attrGroupWithAttrsVo);
@@ -88,6 +92,18 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             attrGroupWithAttrsVo.setAttrs(attrs);
             return attrGroupWithAttrsVo;
         }).collect(Collectors.toList());
-        return attrGroupWithAttrsVos;
+    }
+
+    /**
+     * 获取spu的规格参数信息
+     *
+     * @param catalogId
+     * @param spuId
+     * @return
+     */
+    @Override
+    public List<SpuItemBaseGroupAttrsVo> getAttrGroupWithAttrsBySpuId(Long catalogId, Long spuId) {
+        //1.查出当前spu对应的所有属性的分组信息以及当前分组下的所有属性对应的值
+        return baseMapper.getAttrGroupWithAttrsBySpuId(catalogId,spuId);
     }
 }

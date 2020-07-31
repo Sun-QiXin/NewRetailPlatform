@@ -14,4 +14,14 @@
     </resultMap>
 
 
+    <!--spu的销售属性组合-->
+    <select id="getSaleAttrsBySpuId" resultType="gulimall.product.vo.SkuItemSaleAttrsVo">
+        SELECT ssav.attr_id attr_id,
+        ssav.attr_name attr_name,
+        GROUP_CONCAT(DISTINCT ssav.attr_value) attr_values
+        FROM pms_sku_info info
+        LEFT JOIN pms_sku_sale_attr_value ssav ON ssav.sku_id=info.sku_id
+        WHERE info.spu_id= #{spuId}
+        GROUP BY ssav.attr_id,ssav.attr_name
+    </select>
 </mapper>
