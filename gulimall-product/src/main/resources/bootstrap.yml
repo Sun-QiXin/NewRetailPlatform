@@ -33,3 +33,6 @@ spring:
           - data-id: SpringCache.yaml
             group: dev
             refresh: true
+          - data-id: ThreadPool.yaml
+            group: dev
+            refresh: true

@@ -10,15 +10,10 @@
         <version>1.0.0</version>
     </parent>
 
-    <groupId>gulimall</groupId>
-    <artifactId>gulimall-third-party</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>gulimall-third-party</name>
-    <description>所有使用的第三方服务</description>
-
-    <properties>
-        <java.version>1.8</java.version>
-    </properties>
+    <artifactId>gulimall-auth-server</artifactId>
+    <version>1.0.0</version>
+    <name>gulimall-auth-server</name>
+    <description>认证中心(社交登录、OAuth2.0. 单点登录)</description>
 
     <dependencies>
         <!--公共代码工程-->
@@ -34,17 +29,10 @@
             </exclusions>
         </dependency>
 
-        <!--注解处理器,可以让ConfigurationProperties注解注释的配置文件中的字段在application中提示-->
+        <!--thymeleaf模板引擎-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!--SpringCloudAlibaba的oss对象存储-->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
         <!--SpringCloud集成openfeign服务调用起步依赖-->

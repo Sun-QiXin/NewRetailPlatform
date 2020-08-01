@@ -1,10 +1,10 @@
 #当前服务端口号
 server:
-  port: 30000
+  port: 20000
 
 spring:
   application:
-    name: gulimall-third-party #当前服务名称
+    name: gulimall-auth-server #当前服务名称
   cloud:
     nacos:
       discovery:
@@ -13,11 +13,8 @@ spring:
         server-addr: 192.168.200.199 #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos配置中心
         file-extension: yaml #指定配置文件的后缀名
         group: dev  #表示当前读取的是DEV_GROUP分组下的配置文件，不配置就读取默认分组DEFAULT_GROUP分组
-        namespace: e7df5c68-4cb6-4471-afef-e646714a9ea5 #表示当前读取的是指定命名空间下的配置文件默认是public命名空间
+        namespace: f404f2b1-094c-465e-b2db-00f7c27e017d #表示当前读取的是指定命名空间下的配置文件默认是public命名空间
         extension-configs:  #扩展配置，可以使用一些自定义的配置文件
-          - data-id: alibabaOSS.yaml
-            group: dev
-            refresh: true
-          - data-id: sms.yaml
+          - data-id: other.yaml
             group: dev
             refresh: true

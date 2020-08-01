@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -29,6 +32,9 @@ import gulimall.product.dao.SkuInfoDao;
 import gulimall.product.entity.SkuInfoEntity;
 
 
+/**
+ * @author x3626
+ */
 @Service("skuInfoService")
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> implements SkuInfoService {
     @Autowired
@@ -46,10 +52,13 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     @Autowired
     private WareFeignService wareFeignService;
 
+    @Autowired
+    private ThreadPoolExecutor executor;
+
     /**
      * sku的基本信息；pms_sku_info
      *
-     * @param skuInfoEntity
+     * @param skuInfoEntity sku的基本信息
      */
     @Override
     public void saveSkuInfo(SkuInfoEntity skuInfoEntity) {
@@ -59,8 +68,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     /**
      * 根据传来的参数进行查询
      *
-     * @param params
-     * @return
+     * @param params 传来的参数
+     * @return 分页信息
      */
     @Override
     public PageUtils queryPageByCondition(Map<String, Object> params) {
@@ -68,9 +77,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         //封装模糊查询的参数
         String key = (String) params.get("key");
         if (!StringUtils.isEmpty(key)) {
-            wrapper.and(w -> {
-                w.eq("sku_id", key).or().like("sku_name", key);
-            });
+            wrapper.and(w ->
+                    w.eq("sku_id", key).or().like("sku_name", key)
+            );
         }
         String catelogId = (String) params.get("catelogId");
         if (!StringUtils.isEmpty(catelogId) && !"0".equals(catelogId)) {
@@ -103,8 +112,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     /**
      * 查出当前spuId对应的所有sku信息，品牌的名字。
      *
-     * @param spuId
-     * @return
+     * @param spuId spuId
+     * @return 所有sku信息，品牌的名字
      */
     @Override
     public List<SkuInfoEntity> getSkusBySpuId(Long spuId) {
@@ -113,44 +122,64 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     /**
      * 根据skuId返回页面需要的商品数据
-     *
+     * <br>使用异步方式执行
      * @param skuId skuId
      * @return 商品数据
      */
     @Override
-    public SkuItemVo itemSkuInfo(Long skuId) {
+    public SkuItemVo itemSkuInfo(Long skuId) throws ExecutionException, InterruptedException {
         SkuItemVo skuItemVo = new SkuItemVo();
-        //1、sku基本信息获取   pms_sku_info
-        SkuInfoEntity skuInfoEntity = this.getById(skuId);
-        Long catalogId = skuInfoEntity.getCatalogId();
-        Long spuId = skuInfoEntity.getSpuId();
-        skuItemVo.setInfo(skuInfoEntity);
+        /*使用异步编排的方式执行下面代码,由于下面代2、3、4步码的执行需要用到第一步的返回值，所以使用supplyAsync*/
+        CompletableFuture<SkuInfoEntity> skuInfoFuture = CompletableFuture.supplyAsync(() -> {
+            //1、sku基本信息获取   pms_sku_info
+            SkuInfoEntity skuInfoEntity = this.getById(skuId);
+            skuItemVo.setInfo(skuInfoEntity);
+            return skuInfoEntity;
+        }, executor);
 
-        //2、sku的图片信息    pms_sku_images
-        List<SkuImagesEntity> skuImagesEntities = skuImagesService.getImagesById(skuId);
-        skuItemVo.setImages(skuImagesEntities);
+        /*不需要返回值给其他人使用并且需要在第一个任务完成后调用所以用thenAcceptAsync*/
+        CompletableFuture<Void> saleAttrFuture = skuInfoFuture.thenAcceptAsync(res -> {
+            //2、获取spu的销售属性组合。
+            List<SkuItemSaleAttrsVo> saleAttrsVos = skuSaleAttrValueService.getSaleAttrsBySpuId(res.getSpuId());
+            skuItemVo.setSaleAttrs(saleAttrsVos);
+        }, executor);
 
-        //3、获取spu的销售属性组合。
-        List<SkuItemSaleAttrsVo> saleAttrsVos = skuSaleAttrValueService.getSaleAttrsBySpuId(spuId);
-        skuItemVo.setSaleAttrs(saleAttrsVos);
+        /*不需要返回值给其他人使用并且需要在第一个任务完成后调用所以用thenAcceptAsync*/
+        CompletableFuture<Void> infoDescFuture = skuInfoFuture.thenAcceptAsync(res -> {
+            //3、获取spu的介绍 pms_spu_info_desc
+            SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(res.getSpuId());
+            skuItemVo.setDesp(spuInfoDescEntity);
+        }, executor);
 
-        //4、获取spu的介绍 pms_spu_info_desc
-        SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(spuId);
-        skuItemVo.setDesp(spuInfoDescEntity);
+        /*不需要返回值给其他人使用并且需要在第一个任务完成后调用所以用thenAcceptAsync*/
+        CompletableFuture<Void> groupAttrFuture = skuInfoFuture.thenAcceptAsync(res -> {
+            //4、获取spu的规格参数信息。
+            List<SpuItemBaseGroupAttrsVo> groupAttrsVos = attrGroupService.getAttrGroupWithAttrsBySpuId(res.getCatalogId(), res.getSpuId());
+            skuItemVo.setGroupAttrs(groupAttrsVos);
+        }, executor);
 
-        //5、获取spu的规格参数信息。
-        List<SpuItemBaseGroupAttrsVo> groupAttrsVos = attrGroupService.getAttrGroupWithAttrsBySpuId(catalogId,spuId);
-        skuItemVo.setGroupAttrs(groupAttrsVos);
+        /*使用异步编排的方式执行下面代码,由于下面代码不需要该步返回值，所以使用runAsync*/
+        CompletableFuture<Void> imgFuture = CompletableFuture.runAsync(() -> {
+            //5、sku的图片信息    pms_sku_images
+            List<SkuImagesEntity> skuImagesEntities = skuImagesService.getImagesById(skuId);
+            skuItemVo.setImages(skuImagesEntities);
+        }, executor);
 
-        //6、远程查询当前商品是否有库存
-        R r = wareFeignService.getSkuHasStock(Collections.singletonList(skuId));
-        if (r.getCode()==0){
-            List<SkuHasStockVo> hasStockVos = r.getData(new TypeReference<List<SkuHasStockVo>>() {
-            });
-            for (SkuHasStockVo hasStockVo : hasStockVos) {
-                skuItemVo.setHasStock(hasStockVo.getHasStock());
+        /*使用异步编排的方式执行下面代码,由于下面代码不需要该步返回值，所以使用runAsync*/
+        CompletableFuture<Void> wareFuture = CompletableFuture.runAsync(() -> {
+            //6、远程查询当前商品是否有库存
+            R r = wareFeignService.getSkuHasStock(Collections.singletonList(skuId));
+            if (r.getCode() == 0) {
+                List<SkuHasStockVo> hasStockVos = r.getData(new TypeReference<List<SkuHasStockVo>>() {
+                });
+                for (SkuHasStockVo hasStockVo : hasStockVos) {
+                    skuItemVo.setHasStock(hasStockVo.getHasStock());
+                }
             }
-        }
+        }, executor);
+
+        /*等所有异步任务都完成再返回*/
+        CompletableFuture.allOf(skuInfoFuture, saleAttrFuture, infoDescFuture, groupAttrFuture, imgFuture, wareFuture).get();
         return skuItemVo;
     }
 }
