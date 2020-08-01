@@ -1,11 +1,18 @@
-#以下配置全部是从nacos配置中心读取的
-
-
-spring:
-  cloud:
-    alicloud:
-      access-key: *  #生成的Accesskey子用户信息
-      secret-key: *
-      oss:
-        endpoint: *  #开通的oss服务的外网访问地址
-        bucket: sunqixin-gulimal  #自定义的配置
+##以下配置全部是从nacos配置中心读取的
+#
+#
+#spring:
+#  cloud:
+#    alicloud:
+#      access-key: *  #生成的Accesskey子用户信息
+#      secret-key: *
+#      oss:
+#        endpoint: oss-cn-qingdao.aliyuncs.com  #开通的oss服务的外网访问地址
+#        bucket: sunqixin-gulimal  #自定义的配置
+#      #配置发送短信需要的各种信息，自定义的配置字段
+#      sms:
+#        host: http://feginesms.market.alicloudapi.com
+#        path: /codeNotice
+#        sign: 1
+#        skin: 13
+#        appcode: *

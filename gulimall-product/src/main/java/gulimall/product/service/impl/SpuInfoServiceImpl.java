@@ -1,7 +1,6 @@
 package gulimall.product.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
-import com.sun.xml.internal.bind.v2.TODO;
 import gulimall.common.constant.ProductConstant;
 import gulimall.common.to.SkuReductionTo;
 import gulimall.common.to.SpuBoundTo;
@@ -33,6 +32,9 @@ import gulimall.product.dao.SpuInfoDao;
 import org.springframework.transaction.annotation.Transactional;
 
 
+/**
+ * @author x3626
+ */
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
     @Autowired

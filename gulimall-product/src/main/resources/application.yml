@@ -41,6 +41,7 @@ mybatis-plus:
       logic-delete-value: 0 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 1 # 逻辑未删除值(默认为 0)
 
+
 #打印sql日志
 logging:
   level:
@@ -54,3 +55,10 @@ management:
     web:
       exposure:
         include: '*'
+
+#配置我们自定义的线程池参数，想在配置文件中获得提示需要引入spring-boot-configuration-processor依赖
+gulimall:
+  thread:
+    core-pool-size: 20
+    maximum-pool-size: 200
+    keep-alive-time: 10

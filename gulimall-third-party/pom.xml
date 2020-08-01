@@ -10,10 +10,15 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>gulimall-product</artifactId>
-    <version>1.0.0</version>
-    <name>gulimall-product</name>
-    <description>谷粒商城-商品服务模块</description>
+    <groupId>gulimall</groupId>
+    <artifactId>gulimall-third-party</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>gulimall-third-party</name>
+    <description>所有使用的第三方服务</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
 
     <dependencies>
         <!--公共代码工程-->
@@ -21,13 +26,13 @@
             <groupId>gulimall</groupId>
             <artifactId>gulimall-common</artifactId>
             <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>mybatis-plus-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
-        <!--阿里云的对象存储原生的-->
-        <!--<dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-        </dependency>-->
 
         <!--注解处理器,可以让ConfigurationProperties注解注释的配置文件中的字段在application中提示-->
         <dependency>
@@ -36,29 +41,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!--SpringBoot集成cache缓存-->
+        <!--SpringCloudAlibaba的oss对象存储-->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-
-        <!--使用redisson作为所有分布式锁，分布式对象等功能框架-->
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson</artifactId>
-            <version>3.13.0</version>
-        </dependency>
-
-        <!--SpringBoot集成redis-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-
-        <!--thymeleaf模板引擎-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
         </dependency>
 
         <!--SpringCloud集成openfeign服务调用起步依赖-->

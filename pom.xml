@@ -29,6 +29,7 @@
         <module>gulimall_gateway</module>
         <module>gulimall-third-party</module>
         <module>gulimall-search</module>
+        <module>gulimall-auth-server</module>
     </modules>
 
     <!--统一管理jar包版本-->
