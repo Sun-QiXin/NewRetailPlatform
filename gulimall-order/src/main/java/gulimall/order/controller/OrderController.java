@@ -33,16 +33,6 @@ public class OrderController {
     private OrderService orderService;
 
     /**
-     * 测试服务调用
-     */
-    @RequestMapping("/test")
-    public R test(){
-        OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setMemberUsername("孙启新");
-        return R.ok().put("order", orderEntity);
-    }
-
-    /**
      * 列表
      */
     @RequestMapping("/list")
