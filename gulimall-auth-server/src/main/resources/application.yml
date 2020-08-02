@@ -4,6 +4,9 @@
 spring:
   thymeleaf:
     cache: false #关闭页面缓存
+  redis:    #配置redis
+    host: 192.168.200.132
+    port: 6379
 
 #打印sql日志
 logging:

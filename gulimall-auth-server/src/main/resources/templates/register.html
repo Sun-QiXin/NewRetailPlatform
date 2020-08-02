@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8"/>
@@ -14,7 +14,7 @@
             border: 0;
             display: inline;
             position: relative;
-            left: 15px;
+            left: 10px;
             cursor: pointer;
         }
 
@@ -5973,45 +5973,53 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
     </div>
 </header>
 <section>
-    <form action="" class="one">
+    <form action="/register" method="post" class="one">
         <div class="register-box">
             <label for="username" class="username_label" style="margin: 0">
                 <span>用 户 名</span>
-                <input maxlength="20" id="username" type="text" placeholder="您的用户名和登录名">
+                <input maxlength="20" name="username" id="username" type="text" placeholder="您的用户名和登录名">
             </label>
-            <div class="tips">
+            <div class="tips" style="color: red" th:text="${errors!=null?(#maps.containsKey(errors,'username')?errors.username:''):''}">
 
             </div>
         </div>
         <div class="register-box">
             <label for="password1" class="other_label" style="margin: 0">
                 <span>设 置 密 码</span>
-                <input maxlength="20" id="password1" type="password" placeholder="建议至少使用两种字符组合">
+                <input maxlength="11" minlength="6" name="password" id="password1" type="password"
+                       placeholder="建议至少使用两种字符组合">
             </label>
-            <div class="tips">
+            <div class="tips" style="color: red" th:text="${errors!=null?(#maps.containsKey(errors,'password')?errors.password:''):''}">
 
             </div>
         </div>
         <div class="register-box">
             <label for="password2" class="other_label" style="margin: 0">
                 <span>确 认 密 码</span>
-                <input maxlength="20" id="password2" type="password" placeholder="请再次输入密码">
+                <input maxlength="11" minlength="6" id="password2" type="password" placeholder="请再次输入密码">
             </label>
-            <div class="tips">
+            <div class="tips" style="color: red" th:text="${errors!=null?(#maps.containsKey(errors,'password')?errors.password:''):''}">
 
             </div>
         </div>
         <div class="register-box">
             <label for="phone" class="other_label" style="margin: 0">
                 <span>中国 0086∨</span>
-                <input class="phone" id="phone" maxlength="20" type="text" placeholder="建议使用常用手机">
+                <input class="phone" name="phone" id="phone" maxlength="11" type="text" placeholder="建议使用常用手机">
             </label>
+            <div class="tips" style="color: red" th:text="${errors!=null?(#maps.containsKey(errors,'phone')?errors.phone:''):''}">
+
+            </div>
         </div>
         <div class="register-box">
             <label for="verificationCode" class="other_label" style="margin: 0">
                 <span>验 证 码</span>
-                <input maxlength="20" style="margin-left: 0;" id="verificationCode" type="text" placeholder="请输入验证码" class="caa">
+                <input maxlength="6" name="code" style="margin-left: 0;" id="verificationCode" type="text"
+                       placeholder="请输入验证码" class="caa">
             </label>
+            <div class="tips" style="color: red" th:text="${errors!=null?(#maps.containsKey(errors,'code')?errors.code:''):''}">
+
+            </div>
             <a id="sendCode">发送验证码</a>
         </div>
         <div class="arguement">
@@ -6024,9 +6032,8 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
             <br/>
             <div class="submit_btn">
                 <button type="submit" id="submit_btn">立 即 注 册</button>
-            </div>
+            </div><!---->
         </div>
-
     </form>
     <div class="two">
         <div class="right_r">
@@ -6117,41 +6124,29 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
                 $(this).parent().next("div").text("验证完后，你可以使用该手机登陆和找回密码");
             }
         })
-        $('input').eq(4).focus(function () {
-            if ($(this).val().length === 0) {
-                $(this).parent().next().next("div").text("看不清？点击图片更换验证码");
-            }
-        })
         //input各种判断
         //用户名：
         $('input').eq(0).blur(function () {
             if ($(this).val().length === 0) {
-                $(this).parent().next("div").text("");
-                $(this).parent().next("div").css("color", '#ccc');
-            } else if ($(this).val().length > 0 && $(this).val().length < 4) {
-                $(this).parent().next("div").text("长度只能在4-20个字符之间");
+                $(this).parent().next("div").text("用户名不能为空");
                 $(this).parent().next("div").css("color", 'red');
-            } else if ($(this).val().length >= 4 && !isNaN($(this).val())) {
+            } else if ($(this).val().length > 0 && $(this).val().length < 6) {
+                $(this).parent().next("div").text("长度只能在6-11个字符之间");
+                $(this).parent().next("div").css("color", 'red');
+            } else if ($(this).val().length >= 6 && !isNaN($(this).val())) {
                 $(this).parent().next("div").text("用户名不能为纯数字");
                 $(this).parent().next("div").css("color", 'red');
-            } else {
-                for (let m = 0; m < stuList.length; m++) {
-                    if ($(this).val() === stuList[m].name) {
-                        $(this).parent().next("div").text("该用户名已被注册");
-                        $(this).parent().next("div").css("color", 'red');
-                        return;
-                    }
-                }
+            }else {
                 $(this).parent().next("div").text("");
             }
         })
         //密码
         $('input').eq(1).blur(function () {
             if ($(this).val().length === 0) {
-                $(this).parent().next("div").text("");
-                $(this).parent().next("div").css("color", '#ccc');
+                $(this).parent().next("div").text("密码不能为空");
+                $(this).parent().next("div").css("color", 'red');
             } else if ($(this).val().length > 0 && $(this).val().length < 6) {
-                $(this).parent().next("div").text("长度只能在6-20个字符之间");
+                $(this).parent().next("div").text("长度只能在6-11个字符之间");
                 $(this).parent().next("div").css("color", 'red');
             } else {
                 $(this).parent().next("div").text("");
@@ -6160,8 +6155,8 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
         //	确认密码
         $('input').eq(2).blur(function () {
             if ($(this).val().length === 0) {
-                $(this).parent().next("div").text("");
-                $(this).parent().next("div").css("color", '#ccc');
+                $(this).parent().next("div").text("密码不能为空");
+                $(this).parent().next("div").css("color", 'red');
             } else if ($(this).val() !== $('input').eq(1).val()) {
                 $(this).parent().next("div").text("两次密码不匹配");
                 $(this).parent().next("div").css("color", 'red');
@@ -6172,9 +6167,9 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
         //	手机号
         $('input').eq(3).blur(function () {
             if ($(this).val().length === 0) {
-                $(this).parent().next("div").text("");
-                $(this).parent().next("div").css("color", '#ccc');
-            } else if ($(this).val().substr(0, 3) !== 138 && $(this).val().substr(0, 3) !== 189 && $(this).val().substr(0, 3) !== 139 && $(this).val().substr(0, 3) !== 158 && $(this).val().substr(0, 3) !== 188 && $(this).val().substr(0, 3) !== 157) {
+                $(this).parent().next("div").text("手机号不能为空");
+                $(this).parent().next("div").css("color", 'red');
+            } else if (!(/^1[3456789]\d{9}$/.test($(this).val()))) {
                 $(this).parent().next("div").text("手机号格式不正确");
                 $(this).parent().next("div").css("color", 'red');
             } else if ($(this).val().length != 11) {
@@ -6184,32 +6179,16 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
                 $(this).parent().next("div").text("");
             }
         })
-        // 	验证码
-        //	 验证码刷新
-        function code() {
-            let str = "qwertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOPLKJHGFDSAZXCVBNM";
-            let str1 = 0;
-            for (let i = 0; i < 4; i++) {
-                str1 += str.charAt(Math.floor(Math.random() * 62))
-            }
-            str1 = str1.substring(1)
-            $("#code").text(str1);
-        }
-
-        code();
-        $("#code").click(code);
         //	验证码验证
         $('input').eq(4).blur(function () {
             if ($(this).val().length === 0) {
-                $(this).parent().next().next("div").text("");
-                $(this).parent().next().next("div").css("color", '#ccc');
-            } else if ($(this).val().toUpperCase() !== $("#code").text().toUpperCase()) {
-                $(this).parent().next().next("div").text("验证码不正确");
-                $(this).parent().next().next("div").css("color", 'red');
-            } else {
-                $(this).parent().next().next("div").text("");
+                $(this).parent().next("div").text("验证码不能为空！");
+                $(this).parent().next("div").css("color", 'red');
+            }else {
+                $(this).parent().next("div").text("");
             }
         })
+
         //	提交按钮
         $("#submit_btn").click(function (e) {
             for (let j = 0; j < 5; j++) {
@@ -6233,8 +6212,6 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
                 //发送用户信息
                 stuList.push(new Student($('input').eq(0).val(), $('input').eq(1).val(), $('input').eq(3).val(), stuList.length + 1));
                 localStorage.setItem('stuList', JSON.stringify(stuList));
-                alert("注册成功");
-                window.open("userlist.html", "_blank");
             } else {
                 $("#xieyi").next().next().next(".tips").text("请勾选协议");
                 $("#xieyi").next().next().next(".tips").css("color", 'red');
@@ -6278,9 +6255,14 @@ Cookie</span>是由网页服务器存放在您的访问设备上的文本文件�
             //防止多次点击
             if (!$(this).hasClass("disabled")) {
                 $(this).addClass("disabled");
-                let time = 10;
+                let time = 60;
                 //1、给指定手机发送验证码
-
+                let phone = $("#phone").val();
+                $.get(`/sms/sendCode?phone=${phone}`, data => {
+                    if (data.code != 0) {
+                        alert(data.msg);
+                    }
+                });
                 //2、倒计时效果
                 let countDown = setInterval(() => {
                     $(this).text(`${time--}秒后可再次发送`);

@@ -35,6 +35,12 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
+        <!--SpringBoot集成redis-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!--SpringCloud集成openfeign服务调用起步依赖-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
