@@ -8,6 +8,7 @@ import gulimall.member.exception.PhoneExistException;
 import gulimall.member.exception.UsernameExistException;
 import gulimall.member.vo.MemberLoginVo;
 import gulimall.member.vo.MemberRegisterVo;
+import gulimall.member.vo.SocialUserVo;
 
 import java.util.Map;
 
@@ -59,5 +60,12 @@ public interface MemberService extends IService<MemberEntity> {
      * @return 用户对象
      */
     MemberEntity login(MemberLoginVo memberLoginVo);
+
+    /**
+     * 社交登录
+     * @param socialUserVo 登录信息
+     * @return MemberEntity
+     */
+    MemberEntity OAuth2login(SocialUserVo socialUserVo);
 }
 

@@ -53,7 +53,8 @@
             </p>
         </div>
         <div class="si_bom1 tab" style="display: none;">
-            <div class="error" th:style="${#strings.isEmpty(loginErrorMsg)?'display:none':'display:block'}" th:text="${#strings.isEmpty(loginErrorMsg)?'账户名和密码不能为空':loginErrorMsg}">
+            <div class="error" th:style="${#strings.isEmpty(loginErrorMsg)?'display:none':'display:block'}"
+                 th:text="${#strings.isEmpty(loginErrorMsg)?'账户名和密码不能为空':loginErrorMsg}">
                 <div></div>
                 账户名和密码不能为空
             </div>
@@ -79,9 +80,8 @@
         <div class="si_out">
             <ul>
                 <li>
-                    <a href="#">
-                        <img src="/static/login/JD_img/qq.png"/>
-                        <span>QQ</span>
+                        <a href="https://api.weibo.com/oauth2/authorize?client_id=1406408040&response_type=code&redirect_uri=http://auth.gulimall.com/oauth2.0/weibo/success">
+                        <img src="/static/login/JD_img/weibo.png" height="18x"/>
                     </a>
                 </li>
                 <li class="f4"> |</li>
@@ -157,10 +157,10 @@
             user.style.border = '1px solid red';
             pass.style.border = '1px solid red';
             //禁止提交表单
-            $("#loginForm").submit(()=>{
+            $("#loginForm").submit(() => {
                 return false;
             });
-        }else {
+        } else {
             err.style.display = 'none';
             user.style.border = '1px solid green';
             pass.style.border = '1px solid green';

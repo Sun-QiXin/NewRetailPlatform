@@ -1,5 +1,6 @@
 package gulimall.auth.feign;
 
+import gulimall.auth.vo.SocialUserVo;
 import gulimall.auth.vo.UserLoginVo;
 import gulimall.auth.vo.UserRegisterVo;
 import gulimall.common.utils.R;
@@ -33,4 +34,12 @@ public interface MemberFeignService {
      */
     @PostMapping("/member/member/login")
     R login(@RequestBody UserLoginVo userLoginVo);
+
+    /**
+     * 社交登录
+     * @param socialUserVo 登录信息
+     * @return R对象
+     */
+    @PostMapping("/member/member/oauth2/login")
+    R OAuth2login(@RequestBody SocialUserVo socialUserVo);
 }

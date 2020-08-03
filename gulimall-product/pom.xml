@@ -23,11 +23,11 @@
             <version>1.0.0</version>
         </dependency>
 
-        <!--阿里云的对象存储原生的-->
-        <!--<dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-        </dependency>-->
+        <!--springSession使用redis来完成session共享-->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
 
         <!--注解处理器,可以让ConfigurationProperties注解注释的配置文件中的字段在application中提示-->
         <dependency>

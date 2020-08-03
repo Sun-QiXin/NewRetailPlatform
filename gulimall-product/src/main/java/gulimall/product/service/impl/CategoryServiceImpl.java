@@ -193,7 +193,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     /**
      * <br>获取2级3级分类的json，加入redis缓存
-     * <br>TODO 压力测试时会出现OutOfMemoryError 堆外内存溢出
+     * <br>压力测试时会出现OutOfMemoryError 堆外内存溢出
      * <br>1)、springboot2.o以后默认使用Lettuce作为操作redis的客户端。它使用netty进行网络通信。
      * <br>2).lettuce的bug导致netty堆外内存溢出-Xmx300m; netty如果没有指定堆外内存，默认使用-Xmx300m
      * <br>可以通过-Dio.netty.maxDirectMemory进行设置

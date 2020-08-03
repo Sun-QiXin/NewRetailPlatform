@@ -2,14 +2,14 @@ package gulimall.member.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 会员
- * 
+ *
  * @author SunQiXin
  * @email 15153869872@163.com
  * @date 2020-07-13 10:29:48
@@ -92,5 +92,16 @@ public class MemberEntity implements Serializable {
 	 * 注册时间
 	 */
 	private Date createTime;
-
+    /**
+     *社交登录用户唯一id
+     */
+    private String socialUid;
+    /**
+     *社交登录的访问令牌
+     */
+    private String accessToken;
+    /**
+     *社交登录返回的令牌过期时间
+     */
+    private String expiresIn;
 }

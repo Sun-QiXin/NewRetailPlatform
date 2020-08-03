@@ -8,6 +8,7 @@ import gulimall.member.exception.PhoneExistException;
 import gulimall.member.exception.UsernameExistException;
 import gulimall.member.vo.MemberLoginVo;
 import gulimall.member.vo.MemberRegisterVo;
+import gulimall.member.vo.SocialUserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,22 @@ public class MemberController {
     @PostMapping("/login")
     public R login(@RequestBody MemberLoginVo memberLoginVo){
         MemberEntity memberEntity = memberService.login(memberLoginVo);
+        if (memberEntity!=null){
+            return R.ok().setData(memberEntity);
+        }else {
+            return R.error(BizCodeEnume.USERNAME_PASSWORD_ERROR_EXCEPTION.getCode(),BizCodeEnume.USERNAME_PASSWORD_ERROR_EXCEPTION.getMsg());
+        }
+    }
+
+
+    /**
+     * 社交登录
+     * @param socialUserVo 登录信息
+     * @return R对象
+     */
+    @PostMapping("oauth2/login")
+    public R OAuth2login(@RequestBody SocialUserVo socialUserVo){
+        MemberEntity memberEntity = memberService.OAuth2login(socialUserVo);
         if (memberEntity!=null){
             return R.ok().setData(memberEntity);
         }else {

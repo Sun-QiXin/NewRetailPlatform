@@ -1,5 +1,8 @@
 package gulimall.member.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import gulimall.common.utils.HttpUtils;
 import gulimall.member.entity.MemberLevelEntity;
 import gulimall.member.exception.EmailExistException;
 import gulimall.member.exception.PhoneExistException;
@@ -7,10 +10,12 @@ import gulimall.member.exception.UsernameExistException;
 import gulimall.member.service.MemberLevelService;
 import gulimall.member.vo.MemberLoginVo;
 import gulimall.member.vo.MemberRegisterVo;
+import gulimall.member.vo.SocialUserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -22,6 +27,7 @@ import gulimall.common.utils.Query;
 import gulimall.member.dao.MemberDao;
 import gulimall.member.entity.MemberEntity;
 import gulimall.member.service.MemberService;
+import org.springframework.util.StringUtils;
 
 
 @Service("memberService")
@@ -66,6 +72,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 
         //设置手机号
         memberEntity.setMobile(memberRegisterVo.getPhone());
+
+        //设置注册时间
+        memberEntity.setCreateTime(new Date());
+
+        //设置启用状态
+        memberEntity.setStatus(1);
         this.save(memberEntity);
     }
 
@@ -135,6 +147,70 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             if (flag) {
                 return memberEntity;
             } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 社交登录
+     *
+     * @param socialUserVo 登录信息
+     * @return MemberEntity
+     */
+    @Override
+    public MemberEntity OAuth2login(SocialUserVo socialUserVo) {
+        //登录和注册合并逻辑
+        String uid = socialUserVo.getUid();
+        String accessToken = socialUserVo.getAccess_token();
+        String expiresIn = socialUserVo.getExpires_in();
+        //1、判断当前社交用户是否是第一次登录系统;
+        MemberEntity memberEntity = this.getOne(new QueryWrapper<MemberEntity>().eq("social_uid", uid));
+        if (memberEntity != null) {
+            //说明不是第一次登录
+            memberEntity.setAccessToken(accessToken);
+            memberEntity.setExpiresIn(expiresIn);
+            this.updateById(memberEntity);
+            return memberEntity;
+        } else {
+            //第一次登录，需要注册
+            MemberEntity register = new MemberEntity();
+            //3、 查询当前社交用户的社交账号信息(昵称，性别等)
+            String userDetail = HttpUtils.get("https://api.weibo.com/2/users/show.json?access_token=" + accessToken + "&uid=" + uid, null);
+            if (!StringUtils.isEmpty(userDetail)) {
+                try {
+                    JSONObject jsonObject = JSON.parseObject(userDetail);
+                    String nickname = (String) jsonObject.get("name");
+                    String location = (String) jsonObject.get("location");
+                    String profileImageUrl = (String) jsonObject.get("profile_image_url");
+                    String gender = (String) jsonObject.get("gender");
+                    //设置昵称
+                    register.setNickname(nickname);
+                    //设置地址
+                    register.setCity(location);
+                    //设置性别
+                    register.setGender("m".equals(gender) ? 1 : 0);
+                    //设置头像
+                    register.setHeader(profileImageUrl);
+                    //设置默认等级
+                    MemberLevelEntity levelEntity = memberLevelService.getOne(new QueryWrapper<MemberLevelEntity>().eq("default_status", 1));
+                    register.setLevelId(levelEntity.getId());
+                    //设置启用状态
+                    register.setStatus(1);
+                    //设置注册时间
+                    register.setCreateTime(new Date());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //设置社交登录的访问令牌
+                register.setAccessToken(accessToken);
+                //设置社交登录返回的令牌过期时间
+                register.setExpiresIn(expiresIn);
+                //设置社交登录用户唯一id
+                register.setSocialUid(uid);
+                this.save(register);
+                return register;
+            }else {
                 return null;
             }
         }
