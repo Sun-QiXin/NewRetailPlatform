@@ -17,9 +17,16 @@ spring:
         #endpoint: http://oss-cn-qingdao.aliyuncs.com  #开通的oss服务的外网访问地址
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss #指定返回日期的格式
+
+  session:
+    store-type: redis #指定使用redis来保存session数据
+    redis:
+      namespace: spring:session #存储的命名空间
+
   redis:  #配置redis
     host: 192.168.200.132
     port: 6379
+
   cache:
     type: redis #配置使用redis作为缓存
     redis:

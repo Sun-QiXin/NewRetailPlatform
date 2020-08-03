@@ -29,6 +29,12 @@
             </exclusions>
         </dependency>
 
+        <!--springSession使用redis来完成session共享-->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
         <!--thymeleaf模板引擎-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

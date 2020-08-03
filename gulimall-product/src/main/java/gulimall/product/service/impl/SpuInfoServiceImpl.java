@@ -250,9 +250,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //2、封装每个sku的信息
         //2.1查询当前sku的所有可以被检索的规格属性
         List<ProductAttrValueEntity> attrValueEntities = attrValueService.baseAttrListForSpu(spuId);
-        List<Long> attrValueIds = attrValueEntities.stream().map(attrValueEntity -> {
-            return attrValueEntity.getAttrId();
-        }).collect(Collectors.toList());
+        List<Long> attrValueIds = attrValueEntities.stream().map(ProductAttrValueEntity::getAttrId).collect(Collectors.toList());
         //取出当前id集合中可以被检索的id集合
         List<Long> searchAttrIds = attrService.selectSearchAttrIds(attrValueIds);
         Set<Long> idSet = new HashSet<>(searchAttrIds);

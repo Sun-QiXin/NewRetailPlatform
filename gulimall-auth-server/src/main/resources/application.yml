@@ -2,6 +2,10 @@
 
 
 spring:
+  session:
+    store-type: redis #指定使用redis来保存session数据
+    redis:
+      namespace: spring:session #存储的命名空间
   thymeleaf:
     cache: false #关闭页面缓存
   redis:    #配置redis

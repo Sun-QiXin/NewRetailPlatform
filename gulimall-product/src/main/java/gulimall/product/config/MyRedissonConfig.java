@@ -28,7 +28,6 @@ public class MyRedissonConfig {
         Config config = new Config();
         config.useSingleServer().setAddress("redis://192.168.200.132:6379");
         //根据config创建出RedissonClient实例
-        RedissonClient redissonClient = Redisson.create(config);
-        return redissonClient;
+        return Redisson.create(config);
     }
 }

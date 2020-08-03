@@ -8,6 +8,8 @@ import gulimall.auth.vo.UserRegisterVo;
 import gulimall.common.constant.AuthServerConstant;
 import gulimall.common.exception.BizCodeEnume;
 import gulimall.common.utils.R;
+import gulimall.common.vo.MemberRespVo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -75,8 +78,8 @@ public class LoginController {
      * 注册功能
      * TODO 需要解决分布式下的session问题。
      *
-     * @param userRegisterVo 页面传来的数据
-     * @param bindingResult 校验返回对象
+     * @param userRegisterVo     页面传来的数据
+     * @param bindingResult      校验返回对象
      * @param redirectAttributes 重定向携带数据，利用session原理。 将数据放在session中。只要跳到下一个页面取出这个数据以后，session里 面的数据就会删掉
      * @return R对象
      */
@@ -120,7 +123,7 @@ public class LoginController {
                     errors.put("username", r.get("msg").toString());
                     redirectAttributes.addFlashAttribute("errors", errors);
                     return "redirect:http://auth.gulimall.com/register.html";
-                }else {
+                } else {
                     //注册失败,返回错误信息
                     Map<String, String> errors = new HashMap<>(10);
                     errors.put("username", r.get("msg").toString());
@@ -141,19 +144,24 @@ public class LoginController {
 
     /**
      * 登录功能
-     * @param userLoginVo 登录信息
+     *
+     * @param userLoginVo        登录信息
      * @param redirectAttributes 重定向携带数据
      * @return 主页
      */
     @PostMapping("/login")
-    public String login(UserLoginVo userLoginVo,RedirectAttributes redirectAttributes){
+    public String login(UserLoginVo userLoginVo, RedirectAttributes redirectAttributes, HttpSession session) {
         //调用远程登录
         R r = memberFeignService.login(userLoginVo);
-        if (r.getCode()==0){
-            //TODO 登录成功后的处理
+        if (r.getCode() == 0) {
+            /*将返回的信息存入session(由于整合了springSession并将redis设置为存储对象，所以就存到了redis中)*/
+            MemberRespVo memberRespVo = r.getData(new TypeReference<MemberRespVo>() {
+            });
+            session.setAttribute("member", memberRespVo);
             return "redirect:http://gulimall.com";
-        }else {
-            redirectAttributes.addFlashAttribute("loginErrorMsg",r.getData("msg",new TypeReference<String>(){}));
+        } else {
+            redirectAttributes.addFlashAttribute("loginErrorMsg", r.getData("msg", new TypeReference<String>() {
+            }));
             return "redirect:http://auth.gulimall.com/login.html";
         }
     }
