@@ -1,14 +1,14 @@
 #以下配置全部是从nacos配置中心读取的
 
+
 spring:
-  #关闭页面缓存
-  thymeleaf:
-    cache: false
   session:
     store-type: redis #指定使用redis来保存session数据
     redis:
       namespace: spring:session #存储的命名空间
-  redis:  #配置redis
+  thymeleaf:
+    cache: false #关闭页面缓存
+  redis:    #配置redis
     host: 192.168.200.132
     port: 6379
 
@@ -16,5 +16,5 @@ spring:
 logging:
   level:
     gulimall:
-      search:
+      product:
         dao: debug

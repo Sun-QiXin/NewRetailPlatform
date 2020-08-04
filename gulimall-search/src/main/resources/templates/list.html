@@ -68,10 +68,18 @@
         </b>
         <ul>
             <li>
-                <a href="http://auth.gulimall.com/login.html" class="li_2">你好，请登录</a>
+                <a
+                        th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://search.gulimall.com/list.html':''}"
+                        th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
             </li>
             <li>
-                <a href="http://auth.gulimall.com/register.html">免费注册</a>
+                <a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html"
+                   class="li_2">免费注册</a>
+            </li>
+            <li th:with="query=${#httpServletRequest.getQueryString()}">
+                <a th:if="${session.loginUser!=null}"
+                   th:href="'http://auth.gulimall.com/logout?domainName=http://search.gulimall.com/list.html?'+${query}"
+                   class="li_2">退出</a>
             </li>
             <span>|</span>
             <li>
@@ -1542,7 +1550,8 @@
         </div>
     </div>
 
-    <div style="width: 1210px;margin: 0 auto;margin-bottom: 10px"><img src="/static/search/img/5a33a2e0N9a04b4af.jpg" alt=""></div>
+    <div style="width: 1210px;margin: 0 auto;margin-bottom: 10px"><img src="/static/search/img/5a33a2e0N9a04b4af.jpg"
+                                                                       alt=""></div>
 </div>
 <!--底部-->
 <footer class="footer">

@@ -10,10 +10,10 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>gulimall-search</artifactId>
+    <artifactId>gulimall-shopping-cart</artifactId>
     <version>1.0.0</version>
-    <name>gulimall-search</name>
-    <description>Elasticsearch检索服务</description>
+    <name>gulimall-shopping-cart</name>
+    <description>谷粒商城购物车服务</description>
 
     <dependencies>
         <!--公共代码工程-->
@@ -21,6 +21,12 @@
             <groupId>gulimall</groupId>
             <artifactId>gulimall-common</artifactId>
             <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>mybatis-plus-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--springSession使用redis来完成session共享-->
@@ -29,23 +35,16 @@
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
 
-        <!--SpringBoot集成redis-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-
         <!--thymeleaf模板引擎-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <!--elasticsearch的高阶依赖-->
+        <!--SpringBoot集成redis-->
         <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>${elasticsearch.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <!--SpringCloud集成openfeign服务调用起步依赖-->
