@@ -69,10 +69,14 @@
             </b>
             <ul>
                 <li>
-                    <a href="http://auth.gulimall.com/login.html" th:text="${(session.member!=null)?'欢迎,'+session.member.getNickname():'你好，请登录'}">你好，请登录</a>
+                    <a th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html':''}"
+                       th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
                 </li>
                 <li>
-                    <a href="http://auth.gulimall.com/register.html" class="li_2">免费注册</a>
+                    <a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html" class="li_2">免费注册</a>
+                </li>
+                <li>
+                    <a th:if="${session.loginUser!=null}" href="http://auth.gulimall.com/logout?domainName=http://gulimall.com" class="li_2">退出</a>
                 </li>
                 <li>
                     <a href="#">我的订单</a>
@@ -93,7 +97,7 @@
         <div class="header_ico">
             <div class="header_gw">
                 <img src="/static/index/img/img_15.png"/>
-                <span><a href="/static//购物车\One_JDshop.html">我的购物车</a></span>
+                <span><a href="http://cart.gulimall.com/cartList.html">我的购物车</a></span>
                 <span>0</span>
             </div>
             <div class="header_ko">
@@ -211,15 +215,19 @@
                 <div class="header_main_right_user">
                     <div class="user_info">
                         <div class="user_info_tou">
-                            <a href="#"><img th:src="${(session.member!=null)?session.member.getHeader():'/static/index/img/5a14f104N35803b3a.jpg!q90.webp.jpg'}" alt=""></a>
+                            <a href="#"><img
+                                    th:src="${(session.loginUser!=null)?session.loginUser.getHeader():'/static/index/img/5a14f104N35803b3a.jpg!q90.webp.jpg'}"
+                                    alt=""></a>
                         </div>
                         <div class="user_info_show">
-                            <p th:text="${(session.member!=null)?session.member.getNickname():'你好，请登录'}">你好，请登录></p>
+                            <p th:text="${(session.loginUser!=null)?session.loginUser.getNickname():'你好，请登录'}">
+                                你好，请登录></p>
                             <p>
-                                <a href="http://auth.gulimall.com/login.html" th:if="${session.member==null}">登录</a>
-                                <a  href="http://auth.gulimall.com/register.html" th:if="${session.member==null}">注册</a>
+                                <a href="http://auth.gulimall.com/login.html" th:if="${session.loginUser==null}">登录</a>
+                                <a href="http://auth.gulimall.com/register.html"
+                                   th:if="${session.loginUser==null}">注册</a>
 
-                                <a  href="http://auth.gulimall.com/register.html" th:if="${session.member!=null}">欢迎您的到来！</a>
+                                <a href="http://auth.gulimall.com/register.html" th:if="${session.loginUser!=null}">欢迎您的到来！</a>
                             </p>
                         </div>
                     </div>
@@ -587,7 +595,6 @@
         let keyword = $("#searchText").val()
         window.location.href = "http://search.gulimall.com/list.html?keyword=" + keyword;
     }
-
 </script>
 <script type="text/javascript" src="/static/index/js/text.js"></script>
 <script type="text/javascript" src="/static/index/js/header.js"></script>

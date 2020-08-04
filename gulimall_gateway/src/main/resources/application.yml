@@ -57,3 +57,8 @@ spring:
           uri: lb://gulimall-auth-server  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
           predicates:
             - Host=auth.gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-shopping-cart-host
+          uri: lb://gulimall-shopping-cart #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=cart.gulimall.com  #根据请求头传送的host进行路由

@@ -3,12 +3,14 @@ package gulimall.auth.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import gulimall.auth.feign.MemberFeignService;
+import gulimall.common.constant.AuthServerConstant;
 import gulimall.common.vo.MemberRespVo;
 import gulimall.auth.vo.SocialUserVo;
 import gulimall.common.utils.HttpUtils;
 import gulimall.common.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -33,8 +35,9 @@ public class OAuth2Controller {
     /**
      * 微博社交登录
      *
-     * @param code code
-     * @param redirectAttributes  重定向携带数据
+     * @param code               code
+     * @param redirectAttributes 重定向携带数据
+     * @param session session对象
      * @return 首页
      */
     @GetMapping("/oauth2.0/weibo/success")
@@ -54,23 +57,30 @@ public class OAuth2Controller {
             //1)、当前用户如果是第一次进网站，自动注册进来(为当前社交用户生成一个会员信息账号，以后这个社交账号就对应指定的会员)
             //调用远程服务进行登录或注册
             R r = memberFeignService.OAuth2login(socialUserVo);
-            if (r.getCode()==0){
+            if (r.getCode() == 0) {
                 //登录成功就跳回首页
                 MemberRespVo memberRespVo = r.getData(new TypeReference<MemberRespVo>() {
                 });
                 /*将返回的信息存入session(由于整合了springSession并将redis设置为存储对象，所以就存到了redis中)*/
-                session.setAttribute("member",memberRespVo);
-                return "redirect:http://gulimall.com";
-            }else {
+                session.setAttribute(AuthServerConstant.LOGIN_USER, memberRespVo);
+                if (StringUtils.isEmpty(LoginController.currentOriginUrl)) {
+                    //默认跳转首页
+                    return "redirect:http://gulimall.com";
+                } else {
+                    //如果传了原始网址就跳回原始网址
+                    return "redirect:" + LoginController.currentOriginUrl;
+                }
+            } else {
                 //登录失败，重新登录
-                //TODO 有问题
-                redirectAttributes.addFlashAttribute("loginErrorMsg",r.getData("msg",new TypeReference<String>(){}));
+                String msg = r.getData("msg", new TypeReference<String>() {
+                });
+                redirectAttributes.addFlashAttribute(AuthServerConstant.LOGIN_ERROR_USER, msg);
                 return "redirect:http://auth.gulimall.com/login.html";
             }
 
-        }else {
+        } else {
             //获取失败，重新登录
-            redirectAttributes.addFlashAttribute("loginErrorMsg","获取信息失败，请重新登录");
+            redirectAttributes.addFlashAttribute(AuthServerConstant.LOGIN_ERROR_USER, "获取信息失败，请重新登录");
             return "redirect:http://auth.gulimall.com/login.html";
         }
     }

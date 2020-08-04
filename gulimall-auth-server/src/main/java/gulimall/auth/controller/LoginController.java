@@ -10,6 +10,7 @@ import gulimall.common.exception.BizCodeEnume;
 import gulimall.common.utils.R;
 import gulimall.common.vo.MemberRespVo;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +44,11 @@ public class LoginController {
 
     @Autowired
     private MemberFeignService memberFeignService;
+
+    /**
+     * 点击登录按钮时的原始地址
+     */
+    public static String currentOriginUrl = null;
 
     /**
      * 供前端调用的发送验证码接口
@@ -93,7 +100,7 @@ public class LoginController {
             for (FieldError fieldError : bindingResult.getFieldErrors()) {
                 errors.put(fieldError.getField(), fieldError.getDefaultMessage());
             }
-            redirectAttributes.addFlashAttribute("errors", errors);
+            redirectAttributes.addFlashAttribute(AuthServerConstant.ERRORS, errors);
             //校验失败
             return "redirect:http://auth.gulimall.com/register.html";
         }
@@ -115,19 +122,19 @@ public class LoginController {
                     //注册失败,手机号已存在返回错误信息
                     Map<String, String> errors = new HashMap<>(10);
                     errors.put("phone", r.get("msg").toString());
-                    redirectAttributes.addFlashAttribute("errors", errors);
+                    redirectAttributes.addFlashAttribute(AuthServerConstant.ERRORS, errors);
                     return "redirect:http://auth.gulimall.com/register.html";
                 } else if (r.getCode() == BizCodeEnume.USERNAME_EXIST_EXCEPTION.getCode()) {
                     //注册失败,用户名已存在返回错误信息
                     Map<String, String> errors = new HashMap<>(10);
                     errors.put("username", r.get("msg").toString());
-                    redirectAttributes.addFlashAttribute("errors", errors);
+                    redirectAttributes.addFlashAttribute(AuthServerConstant.ERRORS, errors);
                     return "redirect:http://auth.gulimall.com/register.html";
                 } else {
                     //注册失败,返回错误信息
                     Map<String, String> errors = new HashMap<>(10);
                     errors.put("username", r.get("msg").toString());
-                    redirectAttributes.addFlashAttribute("errors", errors);
+                    redirectAttributes.addFlashAttribute(AuthServerConstant.ERRORS, errors);
                     return "redirect:http://auth.gulimall.com/register.html";
                 }
             } else {
@@ -136,9 +143,32 @@ public class LoginController {
         } else {
             Map<String, String> errors = new HashMap<>(10);
             errors.put("code", "验证码错误");
-            redirectAttributes.addFlashAttribute("errors", errors);
+            redirectAttributes.addFlashAttribute(AuthServerConstant.ERRORS, errors);
             //校验失败
             return "redirect:http://auth.gulimall.com/register.html";
+        }
+    }
+
+    /**
+     * 跳转登录页
+     *
+     * @param session   session
+     * @param originUrl 点击登录按钮时的原始地址
+     * @return 登录或主页
+     */
+    @GetMapping("/login.html")
+    public String loginPage(HttpSession session, @RequestParam(value = "originUrl", required = false) String originUrl) {
+        currentOriginUrl = null;
+        Object attribute = session.getAttribute(AuthServerConstant.LOGIN_USER);
+        if (attribute == null) {
+            //没有登录过
+            if (!StringUtils.isEmpty(originUrl)) {
+                currentOriginUrl = originUrl;
+            }
+            return "login";
+        } else {
+            //登录过跳转首页
+            return "redirect:http://gulimall.com";
         }
     }
 
@@ -157,12 +187,31 @@ public class LoginController {
             /*将返回的信息存入session(由于整合了springSession并将redis设置为存储对象，所以就存到了redis中)*/
             MemberRespVo memberRespVo = r.getData(new TypeReference<MemberRespVo>() {
             });
-            session.setAttribute("member", memberRespVo);
-            return "redirect:http://gulimall.com";
+            session.setAttribute(AuthServerConstant.LOGIN_USER, memberRespVo);
+            if (StringUtils.isEmpty(currentOriginUrl)) {
+                //默认跳转首页
+                return "redirect:http://gulimall.com";
+            } else {
+                //如果传了原始网址就跳回原始网址
+                return "redirect:" + currentOriginUrl;
+            }
+
         } else {
-            redirectAttributes.addFlashAttribute("loginErrorMsg", r.getData("msg", new TypeReference<String>() {
+            redirectAttributes.addFlashAttribute(AuthServerConstant.LOGIN_ERROR_USER, r.getData("msg", new TypeReference<String>() {
             }));
             return "redirect:http://auth.gulimall.com/login.html";
         }
+    }
+
+    /**
+     * 退出登录
+     *
+     * @param session session
+     * @return 返回当前页
+     */
+    @GetMapping("/logout")
+    public String logout(HttpSession session, @RequestParam("domainName") String domainName) {
+        session.removeAttribute(AuthServerConstant.LOGIN_USER);
+        return "redirect:" + domainName;
     }
 }

@@ -8,6 +8,16 @@
     <link rel="stylesheet" type="text/css" href="/static/item/scss/main.css"/>
     <link rel="stylesheet" href="/static/item/scss/header.css"/>
     <link rel="stylesheet" type="text/css" href="/static/item/bootstrap/css/bootstrap.css"/>
+    <style>
+        .glyphicon-map-marker:before {
+            content: "\e062";
+            padding-right: 12px;
+        }
+        .glyphicon-home:before {
+            content: "\e021";
+            padding-right: 15px;
+        }
+    </style>
 </head>
 <body>
 <div id="max">
@@ -15,7 +25,7 @@
         <!--品牌官方网站-->
         <div class="min">
             <ul class="header_ul_left">
-                <li class="glyphicon glyphicon-home"><a href="/static/item/shouye.html" class="aa">京东首页</a></li>
+                <li style="width: 115px" class="glyphicon glyphicon-home"><a href="http://gulimall.com" class="aa">谷粒商城首页</a></li>
                 <li class="glyphicon glyphicon-map-marker"><a href="javascript:">北京</a>
                     <ol id="beijing">
                         <li style="background: red;"><a href="javascript:" style="color: white;">北京</a></li>
@@ -56,9 +66,15 @@
                     </ol>
                 </li>
             </ul>
-            <ul class="header_ul_right">
-                <li style="border: 0;"><a href="http://auth.gulimall.com/login.html" class="aa">你好，请登录</a></li>
-                <li><a href="http://auth.gulimall.com/register.html" style="color: red;">免费注册</a> |</li>
+            <ul class="header_ul_right" style="width: 900px;">
+                <li style="border: 0;width: 150px"><a class="aa"
+                        th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://item.gulimall.com/'+item.getInfo().getSkuId()+'.html':''}"
+                        th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
+                </li>
+                <li><a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html" class="aa">免费注册</a> |</li>
+                <li>
+                    <a th:if="${session.loginUser!=null}" th:href="'http://auth.gulimall.com/logout?domainName=http://item.gulimall.com/'+${item.getInfo().getSkuId()}+'.html'" class="aa">退出</a>
+                </li>
                 <li><a href="javascript:" class="aa">我的订单</a> |</li>
                 <li class="jingdong"><a href="javascript:">我的京东</a><span class="glyphicon glyphicon-menu-down">|</span>
                     <ol class="jingdong_ol">
@@ -1535,7 +1551,7 @@
         let CurrentskuIds = $(this).attr("skuIds").split(",");
         skus.push(CurrentskuIds);
         //3、获取到另外一个选中的属性的组合
-        $("a[class='sku_attr_value checked']").each(function (){
+        $("a[class='sku_attr_value checked']").each(function () {
             skus.push($(this).attr("skuIds").split(","));
         })
         //console.log(skus);
@@ -1546,7 +1562,7 @@
         }
         //console.log(filterEle[0]);
         //4、跳转
-        location.href=`http://item.gulimall.com/${filterEle[0]}.html`;
+        location.href = `http://item.gulimall.com/${filterEle[0]}.html`;
     })
 </script>
 </html>
