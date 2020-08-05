@@ -18,3 +18,10 @@ logging:
     gulimall:
       product:
         dao: debug
+
+#配置我们自定义的线程池参数，想在配置文件中获得提示需要引入spring-boot-configuration-processor依赖
+gulimall:
+  thread:
+    keep-alive-time: 10
+    core-pool-size: 20
+    maximum-pool-size: 200

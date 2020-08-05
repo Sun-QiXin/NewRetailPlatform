@@ -26,14 +26,17 @@
 
         <ul class="hd_wrap_right">
             <li class="forel" style="width: 120px">
-                <a style="width: 120px" th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://cart.gulimall.com/success.html':''}"
+                <a style="width: 120px"
+                   th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://cart.gulimall.com/success.html':''}"
                    th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
             </li>
             <li class="forel">
                 <a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html" class="link_regist">免费注册</a>
             </li>
             <li>
-                <a th:if="${session.loginUser!=null}" th:href="'http://auth.gulimall.com/logout?domainName=http://cart.gulimall.com/success.html'" class="link_regist">退出</a>
+                <a th:if="${session.loginUser!=null}"
+                   th:href="'http://auth.gulimall.com/logout?domainName=http://cart.gulimall.com/success.html'"
+                   class="link_regist">退出</a>
             </li>
             <li class="spacer"></li>
 
@@ -76,15 +79,14 @@
                             <h3 class="ftx-02">商品已成功加入购物车</h3></div>
                         <div class="p-item">
                             <div class="p-img">
-                                <a href="javascript:;" target="_blank"><img style="height: 60px;width:60px;"
-                                                                            src="/static/cart/img/shop1.jpg"></a>
+                                <a href="javascript:;" target="_blank"><img style="height: 60px;width:60px;" th:src="${shoppingCartItem?.getImage()}"></a>
                             </div>
                             <div class="p-info">
                                 <div class="p-name">
-                                    <a th:href="'http://item.gmall.com/'+${skuInfo?.id}+'.html'"
-                                       th:text="${skuInfo?.skuName}">TCL 55A950C 55英寸32核人工智能 HDR曲面超薄4K电视金属机身（枪色）</a>
+                                    <a th:href="'http://item.gulimall.com/'+${shoppingCartItem?.getSkuId()}+'.html'"
+                                       th:text="${shoppingCartItem?.getTitle()}">TCL 55A950C 55英寸32核人工智能 HDR曲面超薄4K电视金属机身（枪色）</a>
                                 </div>
-                                <div class="p-extra"><span class="txt" th:text="'数量：'+${skuNum}">  数量：1</span></div>
+                                <div class="p-extra"><span class="txt" th:text="'数量：'+${shoppingCartItem?.getCount()}">  数量：1</span></div>
                             </div>
                             <div class="clr"></div>
                         </div>
@@ -96,7 +98,7 @@
                         <div class="clr"></div>
                         <div class="bg_shop">
                             <a class="btn-tobback"
-                               th:href="'http://item.gmall.com:8084/'+${skuInfo?.id}+'.html'">查看商品详情</a>
+                               th:href="'http://item.gulimall.com/'+${shoppingCartItem?.getSkuId()}+'.html'">查看商品详情</a>
                             <a class="btn-addtocart" href="http://cart.gulimall.com/cartList.html"
                                id="GotoShoppingCart"><b></b>去购物车结算</a>
                         </div>
