@@ -13,6 +13,7 @@
             content: "\e062";
             padding-right: 12px;
         }
+
         .glyphicon-home:before {
             content: "\e021";
             padding-right: 15px;
@@ -25,7 +26,8 @@
         <!--品牌官方网站-->
         <div class="min">
             <ul class="header_ul_left">
-                <li style="width: 115px" class="glyphicon glyphicon-home"><a href="http://gulimall.com" class="aa">谷粒商城首页</a></li>
+                <li style="width: 115px" class="glyphicon glyphicon-home"><a href="http://gulimall.com" class="aa">谷粒商城首页</a>
+                </li>
                 <li class="glyphicon glyphicon-map-marker"><a href="javascript:">北京</a>
                     <ol id="beijing">
                         <li style="background: red;"><a href="javascript:" style="color: white;">北京</a></li>
@@ -68,12 +70,16 @@
             </ul>
             <ul class="header_ul_right" style="width: 900px;">
                 <li style="border: 0;width: 150px"><a class="aa"
-                        th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://item.gulimall.com/'+item.getInfo().getSkuId()+'.html':''}"
-                        th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
+                                                      th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://item.gulimall.com/'+item.getInfo().getSkuId()+'.html':''}"
+                                                      th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
                 </li>
-                <li><a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html" class="aa">免费注册</a> |</li>
+                <li><a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html"
+                       class="aa">免费注册</a> |
+                </li>
                 <li>
-                    <a th:if="${session.loginUser!=null}" th:href="'http://auth.gulimall.com/logout?domainName=http://item.gulimall.com/'+${item.getInfo().getSkuId()}+'.html'" class="aa">退出</a>
+                    <a th:if="${session.loginUser!=null}"
+                       th:href="'http://auth.gulimall.com/logout?domainName=http://item.gulimall.com/'+${item.getInfo().getSkuId()}+'.html'"
+                       class="aa">退出</a>
                 </li>
                 <li><a href="javascript:" class="aa">我的订单</a> |</li>
                 <li class="jingdong"><a href="javascript:">我的京东</a><span class="glyphicon glyphicon-menu-down">|</span>
@@ -269,10 +275,11 @@
         <div class="nav_min">
             <div class="nav_top">
                 <div class="nav_top_one"><a href="/static/item/#"><img src="/static/item/img/111.png"/></a></div>
-                <div class="nav_top_two"><input type="text"/>
-                    <button>搜索</button>
+                <div class="nav_top_two">
+                    <input id="keyword_input" type="text" placeholder="手机"/>
+                    <button style="outline: none" onclick="searchByKeyword()">搜索</button>
                 </div>
-                <div class="nav_top_three"><a href="/static/item/../JD_Shop/One_JDshop.html">我的购物车</a><span
+                <div class="nav_top_three"><a href="http://cart.gulimall.com/cartList.html">我的购物车</a><span
                         class="glyphicon glyphicon-shopping-cart"></span>
                     <div class="nav_top_three_1">
                         <img src="/static/item/img/44.png"/>购物车还没有商品，赶紧选购吧！
@@ -622,7 +629,7 @@
 
                 <div class="box-btns clear">
                     <div class="box-btns-one">
-                        <input type="text" name="" id="" value="1"/>
+                        <input type="text" name="" id="productNum" value="1"/>
                         <div class="box-btns-one1">
 
                             <div>
@@ -639,8 +646,8 @@
                         </div>
                     </div>
                     <div class="box-btns-two">
-                        <a href="/static/item/../商品分类\index.html">
-                            立即预约
+                        <a href="#" id="addToCart" th:attr="skuId = ${item.getInfo().getSkuId()}">
+                            加入购物车
                         </a>
                     </div>
                     <div class="box-btns-three">
@@ -1532,11 +1539,38 @@
 <script type="text/javascript"></script>
 <script>
     $(function () {
-        //改变售卖属性的css
+        /**
+         * 改变售卖属性的css
+         */
         $(".sku_attr_value.checked").parent().css({
             border: "1px solid red"
         })
+
+        /**
+         * 点击加入购物车
+         */
+        $("#addToCart").click(function () {
+            //获取到商品数量
+            let productNum = $("#productNum").val();
+            //获取当前skuid
+            let skuId = $(this).attr("skuId");
+            location.href = `http://cart.gulimall.com/addToCart?skuId=${skuId}&num=${productNum}`;
+            return false;
+        })
     })
+
+    /**
+     * 在检索页点击搜索框
+     */
+    function searchByKeyword() {
+        let keyword = $("#keyword_input").val();
+        if (keyword != null && keyword.length > 0) {
+            location.href = `http://search.gulimall.com/list.html?keyword=${keyword}`;
+        } else {
+            location.href = "http://search.gulimall.com/list.html"
+        }
+        return false;
+    }
 
     /**
      * 点击某一个销售属性颜色及版本就跳到某一个商品

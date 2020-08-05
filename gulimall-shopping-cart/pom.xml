@@ -35,6 +35,13 @@
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
 
+        <!--注解处理器,可以让ConfigurationProperties注解注释的配置文件中的字段在application中提示-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!--thymeleaf模板引擎-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
