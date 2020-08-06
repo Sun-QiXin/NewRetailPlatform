@@ -1,4 +1,4 @@
-package gulimall.shoppingcart.vo;
+package gulimall.common.vo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

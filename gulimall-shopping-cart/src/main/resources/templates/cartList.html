@@ -32,7 +32,9 @@
                        class="link_regist">免费注册</a>
                 </li>
                 <li>
-                    <a th:if="${session.loginUser!=null}" th:href="'http://auth.gulimall.com/logout?domainName=http://cart.gulimall.com/cartList.html'" class="link_regist">退出</a>
+                    <a th:if="${session.loginUser!=null}"
+                       th:href="'http://auth.gulimall.com/logout?domainName=http://cart.gulimall.com/cartList.html'"
+                       class="link_regist">退出</a>
                 </li>
                 <li class="spacer"></li>
                 <li><a href="">我的订单</a></li>
@@ -64,6 +66,16 @@
             <img src="/static/cart/img/shop_07.jpg" class="one_load_wraing">
             <span>您还没有登录！登录后购物车的商品将保存到您账号中</span>
             <a href="#"><input type="button" onclick="login()" value="立即登录" class="one_load_btn"></a>
+            <p style="display: inline;border: 0" class="one_search_load" th:if="${shoppingCart.getItems()==null}">
+                <img src="/static/cart/img/shop_07.jpg" class="one_load_wraing">
+                <span>购物车中没有商品奥</span>
+                <a href="http://search.gulimall.com/list.html"><input type="button" value="去选择商品" class="one_load_btn"></a>
+            </p>
+        </div>
+        <div class="one_search_load" th:if="${(shoppingCart.getItems()==null) && (session.loginUser!=null)}">
+            <img src="/static/cart/img/shop_07.jpg" class="one_load_wraing">
+            <span>购物车中没有商品奥</span>
+            <a href="http://search.gulimall.com/list.html"><input type="button" value="去选择商品" class="one_load_btn"></a>
         </div>
     </div>
 </div>
@@ -71,8 +83,7 @@
     <div class="OneBdy_box">
         <div class="One_tabTop">
             <div class="One_Topleft">
-                <span>全部商品 </span>
-
+                <span>全部商品</span>
             </div>
 
         </div>
@@ -89,81 +100,46 @@
 
         <div class="One_ShopCon">
             <ul>
-                <li th:each="cartInfo:${cartList}">
+                <li th:each="shoppingCartItem:${shoppingCart.getItems()}">
                     <div></div>
 
                     <div>
                         <ol>
-                            <li><input type="checkbox" class="check" th:value="${cartInfo.skuId}"
-                                       onchange="checkSku(this)"
-                                       th:checked="(${cartInfo.isChecked}==1)?'true':'false'"/></li>
                             <li>
-                                <dt><img th:src="/static/cart/${cartInfo.imgUrl}" src="/static/cart/img\shop1.jpg"
-                                         alt=""></dt>
-                                <dd th:onclick="'toItem('+${cartInfo.skuId}+')'">
-                                    <p>
-                                        <span th:text="${cartInfo.skuName}">TCL 55A950C 55英寸32核</span>
+                                <input type="checkbox" th:attr="skuId=${shoppingCartItem.getSkuId()}"
+                                       class="check isChecked"
+                                       th:checked="${shoppingCartItem.getCheck()}"/>
+                            </li>
+                            <li style="cursor: pointer" th:onclick="'toItem('+${shoppingCartItem.getSkuId()}+')'">
+                                <dt><img th:src="${shoppingCartItem.getImage()}" alt=""></dt>
+                                <dd style="width: 300px">
+                                    <p th:with="attr=${#strings.replace(shoppingCartItem.getSkuAttr(),'[','')}">
+                                        <span th:text="${shoppingCartItem.getTitle()}">TCL 55A950C 55英寸32核</span>
+                                        <br>
+                                        <br>
+                                        <span style="color: #CCC" th:text="${#strings.replace(attr,']','')}">TCL 55A950C 55英寸32核</span>
                                     </p>
                                 </dd>
                             </li>
                             <li>
-                                <p class="dj" th:text="'￥'+${cartInfo.skuPrice}">4599.00</p>
+                                <p class="dj" th:text="'￥'+${shoppingCartItem.getPrice()}">4599.00</p>
                             </li>
                             <li>
-                                <p>
+                                <p th:attr="skuId=${shoppingCartItem.getSkuId()}">
                                     <span>-</span>
-                                    <span th:text="${cartInfo.skuNum}">5</span>
+                                    <span th:text="${shoppingCartItem.getCount()}">5</span>
                                     <span>+</span>
                                 </p>
                             </li>
                             <li style="font-weight:bold">
-                                <p class="zj" th:text="'￥'+${cartInfo.totalPrice}">￥22995.00</p>
+                                <p class="zj" th:text="'￥'+${shoppingCartItem.getSubtotalPrice()}">￥22995.00</p>
                             </li>
                             <li>
-                                <p>删除</p>
+                                <p class="clearOne" th:attr="skuId=${shoppingCartItem.getSkuId()}">删除</p>
                             </li>
                         </ol>
                     </div>
                 </li>
-                <!--<li>
-            <div>
-            </div>
-            <div>
-                <ol>
-                    <li><input type="checkbox"  class="check"></li>
-                    <li>
-                        <dt><img src="/static/cart/img\shop1.jpg" alt=""></dt>
-                        <dd>
-                            <p>
-
-                                <span>TCL 55A950C 55英寸32核</span>
-                                <span>尺码: 55时 超薄曲面 人工智能</span>
-                            </p>
-                            <p>人工智能 HDR曲面超薄4K电视金属机</p>
-
-                        </dd>
-                    </li>
-                    <li>
-                        <p class="dj">￥4599.00</p>
-
-                    </li>
-                    <li>
-                        <p>
-                            <span>-</span>
-                            <span>5</span>
-                            <span>+</span>
-                        </p>
-
-                    </li>
-                    <li style="font-weight:bold"><p class="zj">￥22995.00</p></li>
-                    <li>
-                        <p>删除</p>
-
-                    </li>
-                </ol>
-            </div>
-        </li>-->
-
             </ul>
         </div>
         <div class="One_ShopFootBuy fix1">
@@ -185,7 +161,11 @@
             </div>
             <div>
                 <ol>
-                    <li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt">￥0.00</span></li>
+                    <li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt"
+                                 th:text="'￥'+${shoppingCart.getTotalPrice()}">￥0.00</span></li>
+                    <li style="margin-left: 0px;">优惠:<span style="color:green;font-weight:bold;font-size:16px;"
+                                                           class="fnt"
+                                                           th:text="'￥'+${shoppingCart.getReduce()}">￥0.00</span></li>
 
                 </ol>
             </div>
@@ -210,8 +190,7 @@
         </dl>
     </div>
     <div>
-        <button type="button">删除</button>
-
+        <button type="button" id="deleteOne">删除</button>
     </div>
 </div>
 <div class="One_moveGzIfNull">
@@ -258,53 +237,94 @@
 </body>
 <script src="/static/cart/js/index.js" charset="utf-8"></script>
 <script type="text/javascript">
+    /**
+     * 去结算
+     */
     function toTrade() {
         window.location.href = "http://cart.gmall.com:8087/toTrade";
     }
 
+    /**
+     * 点击商品跳转商品详情页
+     */
     function toItem(skuId) {
-        window.location.href = "http://item.gmall.com:8084/" + skuId + ".html";
+        window.location.href = "http://item.gulimall.com/" + skuId + ".html";
     }
 
+    /**
+     * 登录操作
+     */
     function login() {
         let s = encodeURIComponent("http://cart.gulimall.com/cartList.html");
         window.location.href = "http://auth.gulimall.com/login.html?originUrl=" + s;
     }
 
-    function checkSku(chkbox) {
-        let skuId = $(chkbox).attr("value");
-        let checked = $(chkbox).prop("checked");
-        let isCheckedFlag = "0";
-        if (checked) {
-            isCheckedFlag = "1";
-        }
-        let param = "isChecked=" + isCheckedFlag + "&" + "skuId=" + skuId;
-        $.post("checkCart", param, function (data) {
-            sumSumPrice();
-        });
-
-    }
-
-    //封装总价钱函数
-    function sumSumPrice() {
-        //         let zzj=0;
-        //         $(".check").each(function () {
-        //             if($(this).prop("checked")){
-        //                 let zj = $(this).parents("ol").find(".zj").html().substring(1);
-        //                 zzj=zzj+parseFloat(zj);
-        //             }
-        //             $(".fnt").html("￥"+zzj+".00")
-        //         });
-    }
-
-    /*    //购物车结算固定定位
-        $(document).scroll(function(){
-            if($(window).scrollTop()>50){
-                $(".fix").hide();
-            }else{
-                $(".fix").show();
+    $(function () {
+        /**
+         * 是否是全选不全选
+         */
+        function isChecked() {
+            let checkeds = $(".isChecked");
+            let count = checkeds.length;
+            for (const checked of checkeds) {
+                //拿到选中的项
+                if (!$(checked).prop("checked")) {
+                    count--;
+                    $(".allCheck").prop("checked", false);
+                }
+                if (count == checkeds.length) {
+                    $(".allCheck").prop("checked", true);
+                }
             }
-        })*/
+        }
+
+        /**
+         * 发送请求改变当前选中状态
+         */
+        function updateChecked(skuId, currentThis) {
+            //拿到当前是否选中的布尔值
+            let isChecked = $(currentThis).prop("checked");
+            $.get(`/checkItem?skuId=${skuId}&check=${isChecked ? 1 : 0}`);
+        }
+
+        //页面加载完执行是否是全选不全选的函数
+        isChecked();
+        //点击checkbox就执行是否是全选不全选的函数
+        $(".check").click(function () {
+            isChecked();
+        })
+        /**
+         * 发送请求修改redis中的选中状态
+         */
+        $(".isChecked").click(function () {
+            let skuId = $(this).attr("skuId");
+            updateChecked(skuId, $(this));
+        })
+
+        /**
+         * 点击全选按钮更新redis中的状态
+         */
+        $(".allCheck").click(function () {
+            let isChecked = $(this).prop("checked");
+            $(".allCheck").prop("checked", isChecked);
+            let checkeds = $(".isChecked");
+            for (const checked of checkeds) {
+                //获取当前遍历的skuId
+                let skuId = $(checked).attr("skuId");
+                //遍历更新状态
+                updateChecked(skuId, $(checked));
+            }
+        })
+    })
+
+    //购物车结算固定定位
+    $(document).scroll(function () {
+        if ($(window).scrollTop() > 50) {
+            $(".fix").hide();
+        } else {
+            $(".fix").show();
+        }
+    })
 
 
     //购物车顶端tab
@@ -329,11 +349,13 @@
             "border-bottom": "2px solid red"
         })
     })
+
     //立即登录
     $(".one_search_load input:button").click(function () {
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
+
     //去结算
     $(".One_ShopFootBuy>div:last-child button").mouseover(function () {
         $(this).css("cursor", "pointer");
@@ -342,6 +364,7 @@
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
+
     //buyNum
     $(".One_ShopFootBuy>div:nth-child(2)").mouseover(function () {
         $(this).css("cursor", "pointer")
@@ -356,6 +379,7 @@
             $(".One_ShopFootBuy>div:nth-child(2) img").css("transform", "rotateX(180deg)")
         }
     })
+
     //右侧固定定位
     $(".One_RightFix ul>li:not(:first-child)").mouseover(function () {
         $(this).css({
@@ -371,6 +395,7 @@
             "left": "75px"
         }, 200)
     })
+
     //右侧底部固定定位
     $(".One_RightbtmFix ul>li").mouseover(function () {
         $(this).css({
@@ -386,6 +411,7 @@
             "left": "55px"
         }, 200)
     })
+
     //登录弹框tab切换
     $(".One_DengLu>div:nth-child(3) ul li").mouseover(function () {
         $(this).css("cursor", "pointer")
@@ -402,11 +428,13 @@
         })
         $(".One_DengLu>div:nth-child(3) ol li").eq(i).show().siblings().hide()
     })
+
     //优惠券
     $(".One_ShopBottom>div:nth-child(2) img").click(function () {
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
+
     //配送地址hover效果
     $(".One_Topright span:last-child").mouseover(function () {
         $(this).children(".One_Local").css("display", "block")
@@ -437,6 +465,7 @@
     $(".One_Local>ul>li>ol li").click(function () {
         $(this).parent().parent().children("label").html($(this).html())
     })
+
     //购物车全选反选
     $(".One_ShopTop ul li:first-child .allCheck").click(function () {
         if ($(".One_ShopTop ul li:first-child .allCheck").is(":checked")) {
@@ -473,25 +502,12 @@
             $(".check").prop("checked", false);
         }
     })
-    //如果子选择框没有选中则父选框取消全选
-    $(".check").click(function () {
-        $(".check").each(function () {
-            if ($(this).prop("checked") == true) {
-                $(".allCheck").prop("checked", false);
-            }
-        })
-    })
-    //子选择框全部选中复选框也选中
-    $(".check").click(function () {
-        if ($(".check[class='check']:checked").length == $(".check[class='check']").length) {
-            $(".allCheck").prop("checked", true);
-        } else {
-            $(".allCheck").prop("checked", false)
-        }
-    })
-    //删除已选的商品
+
+
+    /**
+     * 删除已选的商品
+     */
     $(".One_ShopFootBuy>div:first-child ul li:nth-child(2)").click(function () {
-        // $(".check").each(function(){
         if ($(".check").is(":checked") == false) {
             $(".One_mb").show();
             $(".One_moveGzIfNull").show();
@@ -501,25 +517,27 @@
             $(".One_moveGzIfNull").hide();
         }
         //移除结账固定定位
-        // if($(".check").length==1){
-        // 	$(".fix").remove();
-        // }
-        // })
-        //let that=$(this);
+        if ($(".check").length == 1) {
+            $(".fix").remove();
+        }
+        let that = $(this);
         //确定删除
-        /*      $(".One_isDel>div:last-child button:first-child").click(function(){
-                  $(".One_mb").hide();    //蒙版隐藏
-                  $(".One_isDel").hide(); //删除弹框隐藏
-                  $(".check:checked").parent().parent().parent().parent().remove();  //删除选中商品
-                  if($(".fix").offset().top>$(".fix1").offset().top){
-                      $(".fix").hide();
-                  }
-                  if($(".check").length==0){
-                      $(".allCheck").prop("checked",false);
-                      $(".sumNum").html("0");
-                      $(".fnt").html("￥ 0.00");
-                  }
-              })*/
+        $(".One_isDel>div:last-child button:first-child").click(function () {
+            let checkeds = $(".isChecked");
+            let skuIdArr = new Array();
+            for (const checked of checkeds) {
+                //拿到选中的项
+                if ($(checked).prop("checked")) {
+                    //获取skuid
+                    skuIdArr.push($(checked).attr("skuId"));
+                }
+            }
+            let skuIds = skuIdArr.join(",");
+            /*发送请求删除已选择的商品*/
+            $.post("/clearCartProduct", {"skuIds": skuIds}, function () {
+                location.reload();
+            });
+        })
     })
     //确定删除弹框移入我的关注
     $(".One_isDel>div:last-child button:last-child").click(function () {
@@ -575,37 +593,38 @@
         $(".One_mb").show();
         $(".One_clearShop").show()
     })
+
     //购物车+ -
     //鼠标移入变小手
     $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span").mouseover(function () {
         $(this).css("cursor", "pointer")
     })
-    //+
+    //商品增加件数
     $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span:last-child").click(function () {
         let add = $(this).prev("span").html();
+        //获取商品id
+        let skuId = $(this).parent().attr("skuId");
         add++;
         $(this).prev("span").html(add);
-        //总价
-        let dj = $(this).parent().parent().prev().children(".dj").html().substring(1);
-        let sl = $(this).prev("span").html();
-        $(this).parent().parent().parent().children("li:nth-child(5)").children(".zj").html("￥" + dj * sl + ".00")
-        sumSumPrice();
-
+        /*发送请求更新商品件数*/
+        if (add > 1) {
+            location.href = `http://cart.gulimall.com/countItem?skuId=${skuId}&count=${add}`;
+        }
     })
-    //-
+    //商品减少件数
     $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(4) p:first-child span:first-child").click(function () {
         let jian = $(this).next("span").html();
+        //获取商品id
+        let skuId = $(this).parent().attr("skuId");
         jian--;
         if (jian <= 0) {
-            jian = 0;
+            jian = 1;
         }
         $(this).next("span").html(jian);
-        //总价
-        let dj = $(this).parent().parent().prev().children(".dj").html().substring(1);
-        let sl = $(this).next("span").html();
-        $(this).parent().parent().parent().children("li:nth-child(5)").children(".zj").html("￥" + dj * sl + ".00")
-        sumSumPrice();
-
+        /*发送请求更新商品件数*/
+        if (jian > 1) {
+            location.href = `http://cart.gulimall.com/countItem?skuId=${skuId}&count=${jian}`;
+        }
     })
     //选中当前商品背景变色
     $(".check").each(function (index) {
@@ -619,6 +638,7 @@
             }
         })
     })
+
     //商品删除鼠标移入变色
     $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(6) p").mouseover(function () {
         $(this).css({
@@ -639,41 +659,37 @@
         $(".One_mb").show();
         $(".One_DengLu").show();
     })
-    //点击删除
+
+    /**
+     * 点击删除
+     */
     //点击删除出现弹框
     $(".One_isDel>p img").click(function () {
         $(".One_mb").hide();
         $(".One_isDel").hide();
     })
-    $(".One_ShopCon ul li>div:nth-child(2) ol>li:nth-child(6) p:first-child").click(function () {
+    $(".clearOne").click(function () {
+        let skuId = $(this).attr("skuId");
         $(".One_mb").show();
         $(".One_isDel").show();
         let that = $(this);
         //确定删除
-        /*        $(".One_isDel>div:last-child button:first-child").click(function(){
-                    $(".One_mb").hide();
-                    $(".One_isDel").hide();
-                    that.parent().parent().parent().parent().remove();
-                    // 移除结账固定定位
-                    // if($(".check").length==1){
-                    // 	$(".fix").remove();
-                    // }
-                    if($(".fix").offset().top>$(".fix1").offset().top){
-                        $(".fix").hide();
-                    }
-                    if($(".check").length==0){
-                        $(".allCheck").prop("checked",false);
-                        $(".sumNum").html("0");
-                        $(".fnt").html("￥ 0.00");
-                    }
-                })*/
+        $(".One_isDel>div:last-child button:first-child").click(function () {
+            $(".One_mb").hide();
+            $(".One_isDel").hide();
+            /*发送请求*/
+            $.post("/clearCartProduct", {"skuIds": skuId}, function () {
+                location.reload();
+            });
+        })
     })
-    /*    //页面滚动删除去结算固定定位隐藏
-        $(document).scroll(function(){
-            if($(".fix").offset().top>$(".fix1").offset().top){
-                $(".fix").hide();
-            }
-        })*/
+
+    //页面滚动删除去结算固定定位隐藏
+    /* $(document).scroll(function () {
+         if ($(".fix").offset().top > $(".fix1").offset().top) {
+             $(".fix").hide();
+         }
+     })*/
     $(".One_isDel>div:last-child button").mouseover(function () {
         $(this).css("cursor", "pointer");
     })
@@ -686,28 +702,6 @@
     }).mouseout(function () {
         $(this).css("color", "black")
     })
-
-    //封装总价钱函数
-    function sumSumPrice() {
-        console.log("计算总价");
-        let zzj = 0;
-        $(".check").each(function () {
-
-
-            if ($(this).prop("checked")) {
-                console.log("check!!" + $(this).parents("ol").find(".zj").html());
-                let zj = $(this).parents("ol").find(".zj").html().substring(1);
-                console.log(" 价格：" + zj);
-                zzj = zzj + parseFloat(zj);
-            }
-            $(".fnt").html("￥" + zzj + ".00")
-        })
-
-        /*        $(".One_ShopCon ul li>div:nth-child(2) ol li:nth-child(5) .zj").each(function(){
-                    kong+=parseFloat($(this).html().substring(1))
-                })
-                $(".fnt").html("￥"+kong+".00")*/
-    }
 
     //封装总数量函数
     function sumSumNum() {
