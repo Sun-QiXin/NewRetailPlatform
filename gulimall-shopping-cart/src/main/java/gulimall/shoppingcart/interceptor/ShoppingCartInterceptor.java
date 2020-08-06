@@ -4,6 +4,7 @@ import gulimall.common.constant.AuthServerConstant;
 import gulimall.common.constant.ShoppingCartConstant;
 import gulimall.common.vo.MemberRespVo;
 import gulimall.shoppingcart.to.UserInfoTo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;

@@ -1,4 +1,4 @@
-package gulimall.shoppingcart.vo;
+package gulimall.common.vo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -19,7 +19,7 @@ public class ShoppingCartItem implements Serializable {
     /**
      * 商品是否被选中
      */
-    private Boolean check = true;
+    private Boolean check = false;
     /**
      * 商品标题
      */

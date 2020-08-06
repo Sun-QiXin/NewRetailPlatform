@@ -98,10 +98,7 @@
             <div class="header_gw">
                 <img src="/static/index/img/img_15.png"/>
                 <span><a href="http://cart.gulimall.com/cartList.html">我的购物车</a></span>
-                <span>0</span>
-            </div>
-            <div class="header_ko">
-                <p>购物车中还没有商品，赶紧选购吧！</p>
+                <span th:text="${session.shoppingCartInfo?.getCountType()}"></span>
             </div>
         </div>
         <div class="header_form_nav">
@@ -591,6 +588,9 @@
 
 </body>
 <script type="text/javascript">
+    /**
+     * 搜索请求
+     */
     function search() {
         let keyword = $("#searchText").val()
         window.location.href = "http://search.gulimall.com/list.html?keyword=" + keyword;

@@ -15,6 +15,8 @@ import gulimall.product.entity.CategoryEntity;
 import gulimall.product.service.CategoryService;
 import gulimall.common.utils.R;
 
+import javax.servlet.http.HttpSession;
+
 /**
  * 商品三级分类
  *
@@ -36,7 +38,6 @@ public class CategoryController {
         List<CategoryEntity> listTree = categoryService.listWithTree();
         return R.ok().put("data", listTree);
     }
-
 
     /**
      * 信息
