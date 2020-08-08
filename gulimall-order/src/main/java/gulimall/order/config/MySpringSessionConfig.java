@@ -1,4 +1,4 @@
-package gulimall.auth.config;
+package gulimall.order.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

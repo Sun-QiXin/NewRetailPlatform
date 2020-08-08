@@ -25,7 +25,7 @@
         </ul>
 
         <ul class="hd_wrap_right">
-            <li class="forel" style="width: 120px">
+            <li class="forel" style="width: 150px;text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">
                 <a style="width: 120px"
                    th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://cart.gulimall.com/success.html':''}"
                    th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
@@ -41,7 +41,7 @@
             <li class="spacer"></li>
 
             <li>
-                <a href="javascript:;">我的订单</a>
+                <a href="http://order.gulimall.com/list.html">我的订单</a>
             </li>
 
 

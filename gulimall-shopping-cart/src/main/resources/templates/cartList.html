@@ -22,7 +22,7 @@
 
             </ul>
             <ul class="header-right">
-                <li class="forel" style="width: 150px">
+                <li class="forel" style="width: 150px;text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">
                     <a style="width: 120px"
                        th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://cart.gulimall.com/cartList.html':''}"
                        th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
@@ -37,7 +37,7 @@
                        class="link_regist">退出</a>
                 </li>
                 <li class="spacer"></li>
-                <li><a href="">我的订单</a></li>
+                <li><a href="http://order.gulimall.com/list.html">我的订单</a></li>
                 <li class="spacer"></li>
 
             </ul>
@@ -62,7 +62,7 @@
                 <input type="button" value="搜索" class="one_right_btn">
             </div>
         </div>
-        <div class="one_search_load" th:if="${(session.loginUser==null)}">
+        <div id="tips1" class="one_search_load" th:if="${(session.loginUser==null)}">
             <img src="/static/cart/img/shop_07.jpg" class="one_load_wraing">
             <span>您还没有登录！登录后购物车的商品将保存到您账号中</span>
             <a href="#"><input type="button" onclick="login()" value="立即登录" class="one_load_btn"></a>
@@ -72,9 +72,16 @@
                 <a href="http://search.gulimall.com/list.html"><input type="button" value="去选择商品" class="one_load_btn"></a>
             </p>
         </div>
-        <div class="one_search_load" th:if="${(shoppingCart.getItems()==null) && (session.loginUser!=null)}">
+
+        <div id="tips2" class="one_search_load" th:if="${(shoppingCart.getItems()==null) && (session.loginUser!=null)}">
             <img src="/static/cart/img/shop_07.jpg" class="one_load_wraing">
             <span>购物车中没有商品奥</span>
+            <a href="http://search.gulimall.com/list.html"><input type="button" value="去选择商品" class="one_load_btn"></a>
+        </div>
+
+        <div id="tips3" class="one_search_load" style="display: none">
+            <img src="/static/cart/img/shop_07.jpg" class="one_load_wraing">
+            <span>您没有商品可以结算</span>
             <a href="http://search.gulimall.com/list.html"><input type="button" value="去选择商品" class="one_load_btn"></a>
         </div>
     </div>
@@ -99,7 +106,7 @@
         </div>
 
         <div class="One_ShopCon">
-            <ul>
+            <ul id="shopsUl">
                 <li th:each="shoppingCartItem:${shoppingCart.getItems()}">
                     <div></div>
 
@@ -241,7 +248,21 @@
      * 去结算
      */
     function toTrade() {
-        window.location.href = "http://cart.gmall.com:8087/toTrade";
+        let shopsUl = $("#shopsUl>li");
+        //判断当前购物车中有无商品，没有商品就不用跳转结算页
+        if (shopsUl.length > 0) {
+            window.location.href = "http://order.gulimall.com/toTrade";
+        } else {
+            $("#tips1").css({
+                display: "none"
+            });
+            $("#tips2").css({
+                display: "none"
+            });
+            $("#tips3").css({
+                display: "block"
+            });
+        }
     }
 
     /**

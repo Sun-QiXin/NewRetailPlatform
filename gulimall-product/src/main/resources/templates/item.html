@@ -69,19 +69,20 @@
                 </li>
             </ul>
             <ul class="header_ul_right" style="width: 900px;">
-                <li style="border: 0;width: 150px"><a class="aa"
-                                                      th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://item.gulimall.com/'+item.getInfo().getSkuId()+'.html':''}"
-                                                      th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
+
+                <li style="border: 0;width: 150px;text-overflow:ellipsis; white-space:nowrap; overflow:hidden;"><a
+                        class="aa"
+                        th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://item.gulimall.com/'+item.getInfo().getSkuId()+'.html':''}"
+                        th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
                 </li>
-                <li><a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html"
-                       class="aa">免费注册</a> |
+                <li th:if="${session.loginUser==null}"><a href="http://auth.gulimall.com/register.html"
+                                                          class="aa">免费注册</a> |
                 </li>
-                <li>
-                    <a th:if="${session.loginUser!=null}"
-                       th:href="'http://auth.gulimall.com/logout?domainName=http://item.gulimall.com/'+${item.getInfo().getSkuId()}+'.html'"
+                <li th:if="${session.loginUser!=null}">
+                    <a th:href="'http://auth.gulimall.com/logout?domainName=http://item.gulimall.com/'+${item.getInfo().getSkuId()}+'.html'"
                        class="aa">退出</a>
                 </li>
-                <li><a href="javascript:" class="aa">我的订单</a> |</li>
+                <li><a href="http://order.gulimall.com/list.html" class="aa">我的订单</a> |</li>
                 <li class="jingdong"><a href="javascript:">我的京东</a><span class="glyphicon glyphicon-menu-down">|</span>
                     <ol class="jingdong_ol">
                         <li><a href="javascript:">待处理订单</a></li>
@@ -281,9 +282,6 @@
                 </div>
                 <div class="nav_top_three"><a href="http://cart.gulimall.com/cartList.html">我的购物车</a><span
                         class="glyphicon glyphicon-shopping-cart"></span>
-                    <div class="nav_top_three_1">
-                        <img src="/static/item/img/44.png"/>购物车还没有商品，赶紧选购吧！
-                    </div>
                     <span th:text="${session.shoppingCartInfo?.getCountType()}"></span>
                 </div>
             </div>
@@ -1598,6 +1596,18 @@
         //console.log(filterEle[0]);
         //4、跳转
         location.href = `http://item.gulimall.com/${filterEle[0]}.html`;
+    })
+
+    $(function () {
+        //发送请求获取购物车实际货物数量
+        $.ajax({
+            url: "http://cart.gulimall.com/cartList.html",
+            type: "GET",
+            //携带上cookie
+            xhrFields: {
+                withCredentials: true
+            }
+        });
     })
 </script>
 </html>

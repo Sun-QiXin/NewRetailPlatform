@@ -4,7 +4,6 @@ import gulimall.common.constant.AuthServerConstant;
 import gulimall.common.constant.ShoppingCartConstant;
 import gulimall.common.vo.MemberRespVo;
 import gulimall.shoppingcart.to.UserInfoTo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
@@ -35,10 +34,9 @@ public class ShoppingCartInterceptor implements HandlerInterceptor {
      * @param response 响应对象
      * @param handler  选择要执行的处理程序
      * @return true或false
-     * @throws Exception 抛出异常
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         HttpSession session = request.getSession();
         UserInfoTo userInfoTo = new UserInfoTo();
         MemberRespVo memberRespVo = (MemberRespVo) session.getAttribute(AuthServerConstant.LOGIN_USER);
@@ -78,18 +76,22 @@ public class ShoppingCartInterceptor implements HandlerInterceptor {
      *                     execution, for type and/or instance examination
      * @param modelAndView the {@code ModelAndView} that the handler returned
      *                     (can also be {@code null})
-     * @throws Exception in case of errors
      */
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        UserInfoTo userInfoTo = threadLocal.get();
-        //如果是新建的临时用户再放入cookie
-        if (!userInfoTo.getTempUser()){
-            Cookie cookie = new Cookie(ShoppingCartConstant.TEMP_USER_COOKIE_NAME, userInfoTo.getUserKey());
-            //设置作用域
-            cookie.setDomain("gulimall.com");
-            cookie.setMaxAge(ShoppingCartConstant.TEMP_USER_COOKIE_TIMEOUT);
-            response.addCookie(cookie);
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+        try {
+            UserInfoTo userInfoTo = threadLocal.get();
+            //如果是新建的临时用户再放入cookie
+            if (!userInfoTo.getTempUser()) {
+                Cookie cookie = new Cookie(ShoppingCartConstant.TEMP_USER_COOKIE_NAME, userInfoTo.getUserKey());
+                //设置作用域
+                cookie.setDomain("gulimall.com");
+                cookie.setMaxAge(ShoppingCartConstant.TEMP_USER_COOKIE_TIMEOUT);
+                response.addCookie(cookie);
+            }
+        } finally {
+            //必须回收自定义的ThreadLocal变量，尤其在线程池场景下，线程经常会被复用，如果不清理自定义的 ThreadLocal变量，可能会影响后续业务逻辑和造成内存泄露等问题。尽量在代理中使用try-finally块进行回收
+            threadLocal.remove();
         }
     }
 }

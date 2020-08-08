@@ -67,13 +67,12 @@
             </div>
         </b>
         <ul>
-            <li>
-                <a
-                        th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://search.gulimall.com/list.html':''}"
+            <li style="width: 150px;text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">
+                <a th:href="${(session.loginUser==null)?'http://auth.gulimall.com/login.html?originUrl=http://search.gulimall.com/list.html':''}"
                         th:text="${(session.loginUser!=null)?'欢迎,'+session.loginUser.getNickname():'你好，请登录'}">你好，请登录</a>
             </li>
-            <li>
-                <a th:if="${session.loginUser==null}" href="http://auth.gulimall.com/register.html"
+            <li th:if="${session.loginUser==null}">
+                <a href="http://auth.gulimall.com/register.html"
                    class="li_2">免费注册</a>
             </li>
             <li th:with="query=${#httpServletRequest.getQueryString()}">
@@ -83,7 +82,7 @@
             </li>
             <span>|</span>
             <li>
-                <a href="#">我的订单</a>
+                <a href="http://order.gulimall.com/list.html">我的订单</a>
             </li>
             <span>|</span>
             <li class="header_wdjd" style="width:80px;">
@@ -2086,6 +2085,18 @@
     $("#hasStock").change(function () {
         $(this).prop('checked') ? commonSearch("hasStock", 1) : commonSearch("hasStock", "");
         return false;
+    })
+
+    $(function () {
+        //发送请求获取购物车实际货物数量
+        $.ajax({
+            url: "http://cart.gulimall.com/cartList.html",
+            type: "GET",
+            //携带上cookie
+            xhrFields: {
+                withCredentials: true
+            }
+        });
     })
 </script>
 </body>

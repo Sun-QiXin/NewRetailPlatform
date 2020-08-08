@@ -24,3 +24,18 @@ spring:
           - data-id: other.yaml
             group: dev
             refresh: true
+          - data-id: RabbitMQ.yaml
+            group: dev
+            refresh: true
+          - data-id: redis.yaml
+            group: dev
+            refresh: true
+          - data-id: SpringCache.yaml
+            group: dev
+            refresh: true
+          - data-id: springSession.yaml
+            group: dev
+            refresh: true
+          - data-id: ThreadPool.yaml
+            group: dev
+            refresh: true
