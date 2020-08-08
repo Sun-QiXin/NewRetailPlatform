@@ -4,7 +4,21 @@
     <meta charset="utf-8"/>
     <link rel="stylesheet" type="text/css" href="/static/login/JD_sass/JD1.css"/>
     <script src="/static/login/JD_js/jquery-3.1.1.min.js" type="text/javascript" charset="utf-8"></script>
-    <title>gulimall</title>
+    <title>登录</title>
+    <style>
+        .top-3 {
+            margin: 0 auto;
+        }
+        .top-2 {
+            width: 1366px;
+            height: 35px;
+            background: #FFF8F0;
+            margin: 20px auto 0px;
+        }
+        header{
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
 <!--顶部logo-->
@@ -16,10 +30,18 @@
     </div>
 </header>
 
+<div class="top-2" th:if="${session.redirectMsg!=null}">
+    <div class="top-2a">
+        <p style="color: red;">
+            <img style="position: relative;left: -10px;top:10px" width="16px" height="16px" src="/static/login/JD_img/4de5019d2404d347897dee637895d02b_11.png"/>
+            [[${session.redirectMsg}]]
+        </p>
+    </div>
+</div>
+
 <div class="top-2">
     <div class="top-2a">
-        <img src="/static/login/JD_img/4de5019d2404d347897dee637895d02b_11.png"/>
-        <p>依据《网络安全法》，为保障您的账户安全和正常使用，请尽快完成手机号验证！新版《<span>谷粒商城隐私政策</span>》已上线，将更有利于保护您的个人隐私。</p>
+        <p><img style="position: relative;left: -10px;top:10px" width="16px" height="16px" src="/static/login/JD_img/4de5019d2404d347897dee637895d02b_11.png"/>依据《网络安全法》，为保障您的账户安全和正常使用，请尽快完成手机号验证！新版《<span>谷粒商城隐私政策</span>》已上线，将更有利于保护您的个人隐私。</p>
     </div>
 </div>
 
@@ -80,7 +102,7 @@
         <div class="si_out">
             <ul>
                 <li>
-                        <a href="https://api.weibo.com/oauth2/authorize?client_id=1406408040&response_type=code&redirect_uri=http://auth.gulimall.com/oauth2.0/weibo/success">
+                    <a href="https://api.weibo.com/oauth2/authorize?client_id=1406408040&response_type=code&redirect_uri=http://auth.gulimall.com/oauth2.0/weibo/success">
                         <img src="/static/login/JD_img/weibo.png" height="18x"/>
                     </a>
                 </li>

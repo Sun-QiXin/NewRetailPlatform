@@ -10,6 +10,45 @@ spring:
     password: 362623
     url: jdbc:mysql://192.168.200.131:3306/gulimall_oms?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
 
+  session:
+    store-type: redis #指定使用redis来保存session数据
+    redis:
+      namespace: spring:session #存储的命名空间
+
+  redis:  #配置redis
+    host: 192.168.200.132
+    port: 6379
+
+  cache:
+    type: redis #配置使用redis作为缓存
+    redis:
+      time-to-live: 3600000 #设置1个小时的存活时间
+      key-prefix: SpringCache_  #每个缓存空间的前缀
+      use-key-prefix: true  #是否使用缓存前缀
+      cache-null-values: true   #是否使用缓存空值，防止缓存穿透
+
+  #配置RabbitMQ
+  rabbitmq:
+    host: 192.168.200.132
+    port: 5672
+    virtual-host: /gulimall #虚拟主机名称
+    username: admin
+    password: 362623
+    publisher-confirm-type: simple  #开启消息发送到服务端确认回调
+    publisher-returns: true #开启消息抵达队列返回回调
+    template:
+      mandatory: true #只要抵达队列，以异步发送优先回调我们这个returnConfirm
+    listener:
+      simple:
+        acknowledge-mode: manual  #开始手动确认消息
+
+  #指定返回日期的格式
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  #关闭页面缓存
+  thymeleaf:
+    cache: false
+
 #配置mybatis-plus
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml  #mapper文件位置
@@ -30,3 +69,10 @@ management:
     web:
       exposure:
         include: '*'
+
+#配置我们自定义的线程池参数，想在配置文件中获得提示需要引入spring-boot-configuration-processor依赖
+gulimall:
+  thread:
+    core-pool-size: 20
+    maximum-pool-size: 200
+    keep-alive-time: 10

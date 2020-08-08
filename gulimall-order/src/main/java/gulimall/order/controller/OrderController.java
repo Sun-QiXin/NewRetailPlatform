@@ -1,15 +1,16 @@
 package gulimall.order.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
+import gulimall.order.entity.OrderReturnReasonEntity;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import gulimall.order.entity.OrderEntity;
 import gulimall.order.service.OrderService;
@@ -31,6 +32,28 @@ import gulimall.common.utils.R;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping("/sendMsg")
+    public R testRabbitMq(){
+        /*
+         * 发送消息
+         * 参数一：交换机名称
+         * 参数二：路由key
+         * 参数三：发送的消息
+         * 如果发送的消息是个对象，默认会使用序列化机制，将对象写出去。对象必须实现serializable,
+         * 可以配置为json
+         */
+        OrderReturnReasonEntity orderReturnReasonEntity = new OrderReturnReasonEntity();
+        orderReturnReasonEntity.setCreateTime(new Date());
+        orderReturnReasonEntity.setName("麻辣粉可容纳付款啦");
+        orderReturnReasonEntity.setId(111L);
+
+        rabbitTemplate.convertAndSend("hello-java-exchane","hello-java-queue",orderReturnReasonEntity,new CorrelationData(UUID.randomUUID().toString()));
+        return R.ok();
+    }
 
     /**
      * 列表

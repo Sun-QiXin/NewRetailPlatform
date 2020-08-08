@@ -1,15 +1,10 @@
 package gulimall.shoppingcart.controller;
 
 
-import gulimall.common.constant.AuthServerConstant;
-import gulimall.common.utils.R;
-import gulimall.common.vo.MemberRespVo;
-import gulimall.shoppingcart.interceptor.ShoppingCartInterceptor;
 import gulimall.shoppingcart.service.ShoppingCartService;
 
 import gulimall.common.vo.ShoppingCart;
 import gulimall.common.vo.ShoppingCartItem;
-import gulimall.shoppingcart.to.UserInfoTo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 
 
 import javax.servlet.http.HttpSession;

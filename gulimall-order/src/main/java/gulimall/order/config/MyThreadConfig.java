@@ -1,4 +1,4 @@
-package gulimall.product.config;
+package gulimall.order.config;
 
 
 import org.springframework.context.annotation.Bean;
