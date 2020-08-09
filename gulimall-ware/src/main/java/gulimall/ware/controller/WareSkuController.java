@@ -39,7 +39,7 @@ public class WareSkuController {
     }
 
     /**
-     * 查询是否有库存
+     * 根据skuIds集合批量查询是否有库存
      *
      * @param skuIds
      * @return

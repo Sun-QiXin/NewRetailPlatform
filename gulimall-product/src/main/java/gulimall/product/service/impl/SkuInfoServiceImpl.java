@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -181,5 +182,17 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         /*等所有异步任务都完成再返回*/
         CompletableFuture.allOf(skuInfoFuture, saleAttrFuture, infoDescFuture, groupAttrFuture, imgFuture, wareFuture).get();
         return skuItemVo;
+    }
+
+    /**
+     * 根据skuId查询商品价格
+     *
+     * @param skuId 商品skuId
+     * @return r对象
+     */
+    @Override
+    public BigDecimal currentPrice(Long skuId) {
+        SkuInfoEntity skuInfoEntity = this.getById(skuId);
+        return skuInfoEntity.getPrice();
     }
 }

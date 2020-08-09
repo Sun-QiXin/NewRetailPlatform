@@ -282,7 +282,7 @@
                 </div>
                 <div class="nav_top_three"><a href="http://cart.gulimall.com/cartList.html">我的购物车</a><span
                         class="glyphicon glyphicon-shopping-cart"></span>
-                    <span th:text="${session.shoppingCartInfo?.getCountType()}"></span>
+                    <span id="showCartCount"></span>
                 </div>
             </div>
             <div class="nav_down">
@@ -599,7 +599,7 @@
                             </div>
                         </li>
                         <li>
-                            <span th:text="${item.getHasStock()?'有货':'无货'}"></span>， 此商品暂时售完
+                            <span th:text="${item.getHasStock()?'有货，可放心购买':'无货，此商品暂时售完'}"></span>
                         </li>
                     </ul>
                 </div>
@@ -1527,10 +1527,6 @@
         <li class="li1"><a class="aaa" href="#">顶部</a></li>
     </ul>
 </div>
-<div class="gouwuchexiaguo">
-    <img src="/static/item/img/44.png"/>
-    <span>购物车还没有商品，赶紧选购吧！</span>
-</div>
 </body>
 
 <script src="/static/item/js/jquery1.9.js" type="text/javascript" charset="utf-8"></script>
@@ -1599,13 +1595,17 @@
     })
 
     $(function () {
-        //发送请求获取购物车实际货物数量
+        //发送异步请求获取购物车实际货物数量展示
         $.ajax({
-            url: "http://cart.gulimall.com/cartList.html",
+            url: "http://cart.gulimall.com/currentUserShoppingCart",
             type: "GET",
             //携带上cookie
             xhrFields: {
                 withCredentials: true
+            },
+            success:function (shoppingCart){
+                let countType = shoppingCart.countType;
+                $("#showCartCount").html(countType);
             }
         });
     })

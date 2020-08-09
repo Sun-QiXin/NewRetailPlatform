@@ -75,4 +75,12 @@ public interface ShoppingCartService {
      * @param count 要修改成的件数
      */
     void countItem(Long skuId, Integer count);
+
+    /**
+     * 获取当前登录用户的购物车数据返回
+     * @return ShoppingCart
+     * @throws ExecutionException ExecutionException
+     * @throws InterruptedException InterruptedException
+     */
+    ShoppingCart getCurrentUserShoppingCart() throws ExecutionException, InterruptedException;
 }

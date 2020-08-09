@@ -65,7 +65,9 @@ public class ShoppingCart implements Serializable {
         //1、计算购物项总价
         if (items != null && items.size() > 0) {
             for (ShoppingCartItem item : items) {
-                this.totalPrice = this.totalPrice.add(item.getSubtotalPrice());
+                if (item.getCheck()){
+                    this.totalPrice = this.totalPrice.add(item.getSubtotalPrice());
+                }
             }
         }
         //2、减去优惠总价

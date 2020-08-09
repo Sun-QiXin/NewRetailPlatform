@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -97,6 +98,18 @@ public class ShoppingCartController {
     public String countItem(@RequestParam("skuId") Long skuId, @RequestParam("count") Integer count) {
         shoppingCartService.countItem(skuId, count);
         return "redirect:http://cart.gulimall.com/cartList.html";
+    }
+
+    /**
+     * 获取当前登录用户的购物车数据返回
+     * @return ShoppingCart
+     * @throws ExecutionException ExecutionException
+     * @throws InterruptedException InterruptedException
+     */
+    @GetMapping("/currentUserShoppingCart")
+    @ResponseBody
+    public ShoppingCart getCurrentUserShoppingCart() throws ExecutionException, InterruptedException {
+        return shoppingCartService.getCurrentUserShoppingCart();
     }
 
     /**

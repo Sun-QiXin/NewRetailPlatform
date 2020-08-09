@@ -25,7 +25,7 @@ public class LoginUserInterceptor implements HandlerInterceptor {
     /**
      * 用来共享数据
      */
-    private static ThreadLocal<MemberRespVo> threadLocal = new ThreadLocal<>();
+    public static ThreadLocal<MemberRespVo> threadLocal = new ThreadLocal<>();
 
     /**
      * 目标方法执行之前拦截

@@ -300,9 +300,18 @@
         }
 
         /**
-         * 发送请求改变当前选中状态
+         * 发送同步请求改变当前选中状态
          */
         function updateChecked(skuId, currentThis) {
+            //拿到当前是否选中的布尔值
+            let isChecked = $(currentThis).prop("checked");
+            location.href = `/checkItem?skuId=${skuId}&check=${isChecked ? 1 : 0}`;
+        }
+
+        /**
+         * 发送异步请求改变当前选中状态
+         */
+        function updateCheckedAsync(skuId, currentThis) {
             //拿到当前是否选中的布尔值
             let isChecked = $(currentThis).prop("checked");
             $.get(`/checkItem?skuId=${skuId}&check=${isChecked ? 1 : 0}`);
@@ -333,8 +342,11 @@
                 //获取当前遍历的skuId
                 let skuId = $(checked).attr("skuId");
                 //遍历更新状态
-                updateChecked(skuId, $(checked));
+                updateCheckedAsync(skuId, $(checked));
             }
+            setTimeout(() => {
+                location.reload();
+            }, 200)
         })
     })
 
