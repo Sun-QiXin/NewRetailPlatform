@@ -188,6 +188,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     /**
+     * 获取当前登录用户的购物车数据返回
+     * @return ShoppingCart
+     * @throws ExecutionException ExecutionException
+     * @throws InterruptedException InterruptedException
+     */
+    @Override
+    public ShoppingCart getCurrentUserShoppingCart() throws ExecutionException, InterruptedException {
+        return getCartList();
+    }
+
+    /**
      * 根据skuId获取当前购物项
      *
      * @param skuId skuId

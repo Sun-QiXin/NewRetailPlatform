@@ -5,6 +5,7 @@ import gulimall.common.utils.PageUtils;
 import gulimall.product.entity.SkuInfoEntity;
 import gulimall.product.vo.SkuItemVo;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -44,5 +45,12 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
      * @return 商品数据
      */
     SkuItemVo itemSkuInfo(Long skuId) throws ExecutionException, InterruptedException;
+
+    /**
+     * 根据skuId查询商品价格
+     * @param skuId 商品skuId
+     * @return r对象
+     */
+    BigDecimal currentPrice(Long skuId);
 }
 

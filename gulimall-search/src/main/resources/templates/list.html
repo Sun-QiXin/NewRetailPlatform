@@ -420,7 +420,7 @@
         <div class="header_gw">
             <span><a href="http://cart.gulimall.com/cartList.html">我的购物车</a></span>
             <img src="/static/search/image/settleup-@1x.png"/>
-            <span th:text="${session.shoppingCartInfo?.getCountType()}"></span>
+            <span id="showCartCount"></span>
         </div>
     </div>
     <div class="header_form_nav">
@@ -2088,13 +2088,17 @@
     })
 
     $(function () {
-        //发送请求获取购物车实际货物数量
+        //发送异步请求获取购物车实际货物数量展示
         $.ajax({
-            url: "http://cart.gulimall.com/cartList.html",
+            url: "http://cart.gulimall.com/currentUserShoppingCart",
             type: "GET",
             //携带上cookie
             xhrFields: {
                 withCredentials: true
+            },
+            success:function (shoppingCart){
+                let countType = shoppingCart.countType;
+                $("#showCartCount").html(countType);
             }
         });
     })

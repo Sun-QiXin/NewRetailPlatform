@@ -3,8 +3,10 @@ package gulimall.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import gulimall.common.utils.PageUtils;
 import gulimall.order.entity.OrderEntity;
+import gulimall.order.vo.OrderConfirmVo;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 订单
@@ -16,5 +18,22 @@ import java.util.Map;
 public interface OrderService extends IService<OrderEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 跳转结算页，并展示当前需要展示的信息
+     *
+     * @return OrderConfirmVo
+     * @throws ExecutionException ExecutionException
+     * @throws InterruptedException InterruptedException
+     */
+    OrderConfirmVo confirmOrder() throws ExecutionException, InterruptedException;
+
+    /**
+     * 更改当前的默认地址为新指定的
+     * @param memberId     用户id
+     * @param defaultStatus 要更改成的信息
+     * @param addressId 要更改成默认地址的列id
+     */
+    void updateAddress(Long memberId, Integer defaultStatus, Long addressId);
 }
 
