@@ -47,10 +47,11 @@ public class BrandController {
 
 
     /**
-     * 信息
+     * 根据品牌id获取品牌信息
+     * @param brandId 品牌id
+     * @return 品牌信息
      */
     @RequestMapping("/info/{brandId}")
-    //@RequiresPermissions("product:brand:info")
     public R info(@PathVariable("brandId") Long brandId) {
         BrandEntity brand = brandService.getById(brandId);
 

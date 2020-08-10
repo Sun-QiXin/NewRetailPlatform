@@ -2,7 +2,11 @@ package gulimall.ware.service.impl;
 
 import gulimall.common.to.SkuHasStockVo;
 import gulimall.common.utils.R;
+import gulimall.common.exception.NoStockException;
 import gulimall.ware.feign.ProductFeignService;
+import gulimall.ware.vo.OrderItemVo;
+import gulimall.ware.vo.SkuWareHasStockVo;
+import gulimall.ware.vo.WareSkuLockVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,7 @@ import gulimall.common.utils.Query;
 import gulimall.ware.dao.WareSkuDao;
 import gulimall.ware.entity.WareSkuEntity;
 import gulimall.ware.service.WareSkuService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("wareSkuService")
@@ -108,5 +113,54 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             hasStockVo.setHasStock(count != null && count > 0);
             return hasStockVo;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据传来的数据锁定某件商品的库存
+     *
+     * @param wareSkuLockVo wareSkuLockVo
+     * @return 是否锁定成功
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Boolean orderLockStock(WareSkuLockVo wareSkuLockVo) {
+        List<OrderItemVo> orderItemVos = wareSkuLockVo.getOrderItemVos();
+        //1、找到每个商品在哪个仓库都有库存
+        List<SkuWareHasStockVo> wareHasStockVos = orderItemVos.stream().map(item -> {
+            Long skuId = item.getSkuId();
+            SkuWareHasStockVo wareHasStockVo = new SkuWareHasStockVo();
+            wareHasStockVo.setSkuId(skuId);
+            wareHasStockVo.setNum(item.getCount());
+            List<Long> wareIds = this.baseMapper.listWareIdHasSkuStock(skuId);
+            wareHasStockVo.setWareIds(wareIds);
+            return wareHasStockVo;
+        }).collect(Collectors.toList());
+
+        //2、锁定库存
+        for (SkuWareHasStockVo wareHasStockVo : wareHasStockVos) {
+            boolean skuStocked = false;
+            Long skuId = wareHasStockVo.getSkuId();
+            Integer num = wareHasStockVo.getNum();
+            List<Long> wareIds = wareHasStockVo.getWareIds();
+            if (wareIds == null || wareIds.size() == 0) {
+                //没有仓库有该商品的库存
+                throw new NoStockException(skuId);
+            }
+            for (Long wareId : wareIds) {
+                //锁定库存
+                int count = this.baseMapper.lockSkuStock(skuId, num, wareId);
+                if (count == 1) {
+                    //锁定成功
+                    skuStocked = true;
+                    break;
+                }
+                //当前仓库锁定失败，重试下一个仓库
+            }
+            if (!skuStocked) {
+                //当前遍历的商品全部扣减库存失败
+                throw new NoStockException(skuId);
+            }
+        }
+        return true;
     }
 }

@@ -26,4 +26,20 @@ public interface ProductFeignService {
      */
     @GetMapping("/product/skuinfo/price/{skuId}")
     BigDecimal currentPrice(@PathVariable("skuId") Long skuId);
+
+    /**
+     * 根据skuId查询spu信息
+     * @param skuId skuId
+     * @return spu信息
+     */
+    @GetMapping("/product/spuinfo/getSpuInfoBySkuId/{skuId}")
+    R getSpuInfoBySkuId(@PathVariable("skuId") Long skuId);
+
+    /**
+     * 根据品牌id获取品牌信息
+     * @param brandId 品牌id
+     * @return 品牌信息
+     */
+    @RequestMapping("/product/brand/info/{brandId}")
+    R getBrandInfoById(@PathVariable("brandId") Long brandId);
 }

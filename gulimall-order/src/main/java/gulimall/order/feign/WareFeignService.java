@@ -1,6 +1,7 @@
 package gulimall.order.feign;
 
 import gulimall.common.utils.R;
+import gulimall.order.vo.WareSkuLockVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,4 +26,13 @@ public interface WareFeignService {
      */
     @PostMapping("/ware/waresku/hasStock")
     R getSkuHasStock(@RequestBody List<Long> skuIds);
+
+
+    /**
+     * 根据传来的数据锁定某件商品的库存
+     * @param wareSkuLockVo wareSkuLockVo
+     * @return R
+     */
+    @PostMapping("/ware/waresku/lock/order")
+    R orderLockStock(@RequestBody WareSkuLockVo wareSkuLockVo);
 }

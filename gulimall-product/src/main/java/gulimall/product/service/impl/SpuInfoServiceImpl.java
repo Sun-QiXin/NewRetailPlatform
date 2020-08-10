@@ -317,4 +317,16 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             log.error("上架失败");
         }
     }
+
+    /**
+     * 根据skuId查询spu信息
+     *
+     * @param skuId skuId
+     * @return spu信息
+     */
+    @Override
+    public SpuInfoEntity getSpuInfoBySkuId(Long skuId) {
+        SkuInfoEntity skuInfoEntity = skuInfoService.getById(skuId);
+        return this.getById(skuInfoEntity.getSpuId());
+    }
 }

@@ -63,7 +63,7 @@ public class MemberReceiveAddressController {
 
 
     /**
-     * 信息
+     * 根据ID获取收货地址信息
      */
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id) {

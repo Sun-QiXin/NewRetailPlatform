@@ -14,6 +14,7 @@ package gulimall.common.exception;
  *  <br>13: 购物车
  *  <br>14: 物流
  *  <br>15: 用户
+ *  <br>21: 库存
  * @author x3626
  */
 public enum BizCodeEnume {
@@ -45,6 +46,10 @@ public enum BizCodeEnume {
      * 帐号或密码错误
      */
     USERNAME_PASSWORD_ERROR_EXCEPTION(15004,"帐号或密码错误"),
+    /**
+     * 库存不足异常
+     */
+   NO_STOCK_EXCEPTION(21000,"商品库存不足"),
     /**
      * 商品上架异常
      */

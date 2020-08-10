@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import gulimall.common.utils.PageUtils;
 import gulimall.order.entity.OrderEntity;
 import gulimall.order.vo.OrderConfirmVo;
+import gulimall.order.vo.OrderSubmitVo;
+import gulimall.order.vo.SubmitOrderResponseVo;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -35,5 +37,12 @@ public interface OrderService extends IService<OrderEntity> {
      * @param addressId 要更改成默认地址的列id
      */
     void updateAddress(Long memberId, Integer defaultStatus, Long addressId);
+
+    /**
+     * 提交订单
+     * @param orderSubmitVo  orderSubmitVo
+     * @return SubmitOrderResponseVo
+     */
+    SubmitOrderResponseVo submitOrder(OrderSubmitVo orderSubmitVo);
 }
 
