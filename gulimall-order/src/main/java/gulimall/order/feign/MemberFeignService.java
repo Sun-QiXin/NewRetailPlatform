@@ -39,4 +39,11 @@ public interface MemberFeignService {
     @RequestMapping("/member/memberreceiveaddress/updateAddress")
     R updateAddress(@RequestParam("memberId") Long memberId, @RequestParam("defaultStatus") Integer defaultStatus,@RequestParam("addressId") Long addressId);
 
+    /**
+     * 根据ID获取收货地址信息
+     * @param id 地址id
+     * @return R 对象
+     */
+    @RequestMapping("/member/memberreceiveaddress/info/{id}")
+    R getAddressById(@PathVariable("id") Long id);
 }

@@ -329,6 +329,16 @@
     </div>
 </header>
 
+<div style="    height: 20px;
+    background: #E4393C;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+    line-height: 20px;
+    font-size: 12px;" th:if="${submitOrderErrorMsg!=null}">
+    <p th:text="${submitOrderErrorMsg}">谷粒学院自提</p>
+</div>
+
 <!--logo图片-->
 <div class="top-1" style="">
     <a href="http://gulimall.com"><img src="/static/order/confirm/img/logo1.jpg" class="img1"/></a><span>结算页</span>
@@ -472,6 +482,7 @@
         <span>优惠组合推荐</span>
     </div>
 </div>
+
 <div class="xia">
     <div class="qian">
         <p class="qian_y">
@@ -507,7 +518,18 @@
             寄送至： [[${address.province}]] [[${address.city}]] [[${address.region}]] [[${address.detailAddress}]]
             邮编：[[${address.postCode}]] 姓名：[[${address.name}]] 手机号：[[${address.phone}]]</p>
     </div>
-    <button class="tijiao">提交订单</button>
+    <form action="http://order.gulimall.com/submitOrder" method="post">
+        <input name="addressId" type="hidden" value="" id="submitAddressId">
+        <input name="note" value="" type="hidden">
+        <input name="integrationAmount" th:value="${orderConfirmVo.getIntegration()/2}" type="hidden">
+        <input name="totalAmount" th:value="${orderConfirmVo.getTotalOriginalPrice()}" type="hidden">
+        <input name="payType" type="hidden" th:value="1">
+        <input name="payPrice" type="hidden"
+               th:value="${orderConfirmVo.getTotalPricePayable()}">
+        <input name="orderToken" type="hidden" th:value="${orderConfirmVo.getOrderToken()}">
+        <button style="margin-bottom: 10px;cursor: pointer" class="tijiao" type="submit">提交订单</button>
+    </form>
+
 </div>
 </div>
 
@@ -742,12 +764,27 @@
         })
 
         /**
+         * 设置提交订单时要提交的地址id
+         */
+        function setAddress() {
+            let checkboxs = $(".addressChecked");
+            for (const checkbox of checkboxs) {
+                if ($(checkbox).prop("checked")) {
+                    $("#submitAddressId").val($(checkbox).attr("addressId"));
+                }
+            }
+        }
+
+        setAddress();
+
+        /**
          * 选中地址高亮，然后发送请求修改默认地址为当前选中的地址
          */
         $(".addressChecked").click(function () {
             //获取当前地址id
             let addressId = $(this).attr("addressId");
             let memberId = $(this).attr("memberId");
+
             $(this).parent().find("p").css({
                 border: "1px red solid"
             });

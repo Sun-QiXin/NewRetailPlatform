@@ -1,14 +1,14 @@
 package gulimall.order.web;
 
 import gulimall.order.service.OrderService;
-import gulimall.order.vo.MemberAddressVo;
 import gulimall.order.vo.OrderConfirmVo;
+import gulimall.order.vo.OrderSubmitVo;
+import gulimall.order.vo.SubmitOrderResponseVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.concurrent.ExecutionException;
 
@@ -36,6 +36,38 @@ public class OrderWebController {
         OrderConfirmVo orderConfirmVo = orderService.confirmOrder();
         model.addAttribute("orderConfirmVo", orderConfirmVo);
         return "confirm";
+    }
+
+    /**
+     * 提交订单
+     *
+     * @param orderSubmitVo orderSubmitVo
+     * @param model         model
+     * @return 支付页面
+     */
+    @RequestMapping("/submitOrder")
+    public String submitOrder(OrderSubmitVo orderSubmitVo, Model model, RedirectAttributes redirectAttributes) {
+        SubmitOrderResponseVo submitOrderResponseVo = orderService.submitOrder(orderSubmitVo);
+        if (submitOrderResponseVo.getCode() == 0) {
+            //下单成功
+            model.addAttribute("submitOrderResponseVo", submitOrderResponseVo);
+            return "pay";
+        } else {
+            //返回结算页并显示失败原因
+            String msg = "";
+            switch (submitOrderResponseVo.getCode()) {
+                case 1:
+                    msg = "下单失败，请重新提交订单！";
+                    break;
+                case 2:
+                    msg = "下单失败，没有库存了";
+                    break;
+                default:break;
+            }
+            redirectAttributes.addFlashAttribute("submitOrderErrorMsg", msg);
+            return "redirect:http://order.gulimall.com/toTrade";
+        }
+
     }
 
     /**

@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import gulimall.common.exception.BizCodeEnume;
 import gulimall.common.to.SkuHasStockVo;
+import gulimall.ware.vo.LockStockResultVo;
+import gulimall.ware.vo.WareSkuLockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +34,6 @@ public class WareSkuController {
      * 列表
      */
     @RequestMapping("/list")
-    //@RequiresPermissions("ware:waresku:list")
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = wareSkuService.queryPage(params);
 
@@ -39,10 +41,26 @@ public class WareSkuController {
     }
 
     /**
+     * 根据传来的数据锁定某件商品的库存
+     * @param wareSkuLockVo wareSkuLockVo
+     * @return R
+     */
+    @PostMapping("/lock/order")
+    public R orderLockStock(@RequestBody WareSkuLockVo wareSkuLockVo){
+        Boolean flag = null;
+        try {
+            flag = wareSkuService.orderLockStock(wareSkuLockVo);
+            return R.ok();
+        } catch (Exception e) {
+            return R.error(BizCodeEnume.NO_STOCK_EXCEPTION.getCode(),BizCodeEnume.NO_STOCK_EXCEPTION.getMsg());
+        }
+    }
+
+    /**
      * 根据skuIds集合批量查询是否有库存
      *
-     * @param skuIds
-     * @return
+     * @param skuIds skuId集合
+     * @return R
      */
     @PostMapping("/hasStock")
     public R getSkuHasStock(@RequestBody List<Long> skuIds) {
