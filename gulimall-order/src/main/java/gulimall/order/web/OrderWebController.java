@@ -1,5 +1,6 @@
 package gulimall.order.web;
 
+import gulimall.common.exception.NoStockException;
 import gulimall.order.service.OrderService;
 import gulimall.order.vo.OrderConfirmVo;
 import gulimall.order.vo.OrderSubmitVo;
@@ -47,27 +48,36 @@ public class OrderWebController {
      */
     @RequestMapping("/submitOrder")
     public String submitOrder(OrderSubmitVo orderSubmitVo, Model model, RedirectAttributes redirectAttributes) {
-        SubmitOrderResponseVo submitOrderResponseVo = orderService.submitOrder(orderSubmitVo);
-        if (submitOrderResponseVo.getCode() == 0) {
-            //下单成功
-            model.addAttribute("submitOrderResponseVo", submitOrderResponseVo);
-            return "pay";
-        } else {
-            //返回结算页并显示失败原因
-            String msg = "";
-            switch (submitOrderResponseVo.getCode()) {
-                case 1:
-                    msg = "下单失败，请重新提交订单！";
-                    break;
-                case 2:
-                    msg = "下单失败，没有库存了";
-                    break;
-                default:break;
+        try {
+            SubmitOrderResponseVo submitOrderResponseVo = orderService.submitOrder(orderSubmitVo);
+            if (submitOrderResponseVo.getCode() == 0) {
+                //下单成功
+                model.addAttribute("submitOrderResponseVo", submitOrderResponseVo);
+                return "pay";
+            } else {
+                //返回结算页并显示失败原因
+                String msg = "";
+                switch (submitOrderResponseVo.getCode()) {
+                    case 1:
+                        msg = "下单失败，请重新提交订单！";
+                        break;
+                    case 2:
+                        msg = "下单失败，没有库存了";
+                        break;
+                    default:
+                        break;
+                }
+                redirectAttributes.addFlashAttribute("submitOrderErrorMsg", msg);
+                return "redirect:http://order.gulimall.com/toTrade";
+            }
+        } catch (Exception e) {
+            String msg = "下单的人太多了，请重新提交订单";
+            if (e instanceof NoStockException) {
+                msg = e.getMessage();
             }
             redirectAttributes.addFlashAttribute("submitOrderErrorMsg", msg);
             return "redirect:http://order.gulimall.com/toTrade";
         }
-
     }
 
     /**

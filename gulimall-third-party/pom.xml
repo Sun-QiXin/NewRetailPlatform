@@ -34,6 +34,12 @@
             </exclusions>
         </dependency>
 
+        <!--SpringCloudAlibaba的seata分布式事务管理(注意与安装的seata版本一致)-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-seata</artifactId>
+        </dependency>
+
         <!--注解处理器,可以让ConfigurationProperties注解注释的配置文件中的字段在application中提示-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

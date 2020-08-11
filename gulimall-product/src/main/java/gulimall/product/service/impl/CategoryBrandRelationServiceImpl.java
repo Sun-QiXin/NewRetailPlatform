@@ -1,4 +1,5 @@
 package gulimall.product.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import gulimall.product.entity.BrandEntity;
 import gulimall.product.entity.CategoryEntity;
@@ -79,6 +80,7 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
     /**
      * 同步更新分类数据
+     *
      * @param catId
      * @param name
      */
@@ -101,10 +103,7 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     public List<BrandEntity> getBrandsByCatId(Long catId) {
         List<CategoryBrandRelationEntity> categoryBrandRelationEntityList = this.list(new QueryWrapper<CategoryBrandRelationEntity>().eq("catelog_id", catId));
 
-        List<BrandEntity> brandEntities = categoryBrandRelationEntityList.stream().map(categoryBrandRelationEntity -> {
-            BrandEntity brandEntity = brandService.getById(categoryBrandRelationEntity.getBrandId());
-            return brandEntity;
-        }).collect(Collectors.toList());
-        return brandEntities;
+        return categoryBrandRelationEntityList.stream().map(categoryBrandRelationEntity -> brandService.getById(categoryBrandRelationEntity.getBrandId())
+        ).collect(Collectors.toList());
     }
 }

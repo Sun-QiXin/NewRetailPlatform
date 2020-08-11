@@ -34,6 +34,9 @@ import gulimall.product.service.AttrService;
 import org.springframework.transaction.annotation.Transactional;
 
 
+/**
+ * @author x3626
+ */
 @Service("attrService")
 public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements AttrService {
 
@@ -197,15 +200,12 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     public List<AttrEntity> getAttrRelation(Long groupId) {
         List<AttrAttrgroupRelationEntity> relationEntities = attrAttrgroupRelationService.list(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", groupId));
 
-        List<Long> attrIds = relationEntities.stream().map((relationEntity) -> {
-            return relationEntity.getAttrId();
-        }).collect(Collectors.toList());
+        List<Long> attrIds = relationEntities.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
 
-        if (attrIds == null || attrIds.size() == 0) {
+        if (attrIds.size() == 0) {
             return null;
         }
-        List<AttrEntity> attrEntities = this.listByIds(attrIds);
-        return attrEntities;
+        return this.listByIds(attrIds);
     }
 
     /**
@@ -240,19 +240,15 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         //2、当前分组只能关联别的分组没有引用的属性
         //2.1)、当前分类下的其他分组
         List<AttrGroupEntity> group = attrGroupService.getBaseMapper().selectList(new QueryWrapper<AttrGroupEntity>().eq("catelog_id", catelogId));
-        List<Long> collect = group.stream().map(item -> {
-            return item.getAttrGroupId();
-        }).collect(Collectors.toList());
+        List<Long> collect = group.stream().map(AttrGroupEntity::getAttrGroupId).collect(Collectors.toList());
 
         //2.2)、这些分组关联的属性
         List<AttrAttrgroupRelationEntity> groupId = attrAttrgroupRelationService.getBaseMapper().selectList(new QueryWrapper<AttrAttrgroupRelationEntity>().in("attr_group_id", collect));
-        List<Long> attrIds = groupId.stream().map(item -> {
-            return item.getAttrId();
-        }).collect(Collectors.toList());
+        List<Long> attrIds = groupId.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
 
         //2.3)、从当前分类的所有属性中移除这些属性；
         QueryWrapper<AttrEntity> wrapper = new QueryWrapper<AttrEntity>().eq("catelog_id", catelogId).eq("attr_type", ProductConstant.AttrEnum.ATTR_BASE_TYPE.getCode());
-        if (attrIds != null && attrIds.size() > 0) {
+        if (attrIds.size() > 0) {
             wrapper.notIn("attr_id", attrIds);
         }
         String key = (String) params.get("key");
@@ -263,8 +259,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }
 
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper);
-        PageUtils pageUtils = new PageUtils(page);
-        return pageUtils;
+        return new PageUtils(page);
     }
 
     /**
@@ -275,7 +270,6 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
      */
     @Override
     public List<Long> selectSearchAttrIds(List<Long> attrValueIds) {
-        List<Long> ids = this.baseMapper.selectSearchAttrIds(attrValueIds);
-        return ids;
+        return this.baseMapper.selectSearchAttrIds(attrValueIds);
     }
 }
