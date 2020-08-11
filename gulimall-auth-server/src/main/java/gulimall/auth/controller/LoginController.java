@@ -83,7 +83,6 @@ public class LoginController {
 
     /**
      * 注册功能
-     * TODO 需要解决分布式下的session问题。
      *
      * @param userRegisterVo     页面传来的数据
      * @param bindingResult      校验返回对象

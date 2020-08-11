@@ -185,7 +185,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     }
 
     /**
-     * 提交订单
+     * 提交订单,这里不用seata分布式事务，这是个高并发操作，库存服务本身使用自动解锁模式,我们使用消息队列进行通知解锁，保证最终一致性即可
      *
      * @param orderSubmitVo orderSubmitVo
      * @return SubmitOrderResponseVo
@@ -231,7 +231,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             } else {
                 //锁定失败,抛出异常
                 submitOrderResponseVo.setCode(2);
-                //TODO 分布式事务
                 throw new NoStockException(3L);
             }
         } else {

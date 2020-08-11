@@ -32,3 +32,25 @@ management:
     web:
       exposure:
         include: '*'
+
+seata:
+  enabled: true
+  application-id: gulimall-ware #服务唯一id,使用当前服务名称即可
+  tx-service-group: my_test_tx_group #service.vgroupMapping后面跟着的名字
+  enable-auto-data-source-proxy: true #自动数据源代理
+  config: #配置中心的相关配置
+    type: nacos
+    nacos:
+      namespace: 8168949a-6a7a-48ac-b12d-8866fa941b01
+      serverAddr: 192.168.200.199
+      group: SEATA_GROUP
+      userName: "nacos"
+      password: "nacos"
+  registry: #注册中心相关配置
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 192.168.200.199
+      namespace:
+      userName: "nacos"
+      password: "nacos"

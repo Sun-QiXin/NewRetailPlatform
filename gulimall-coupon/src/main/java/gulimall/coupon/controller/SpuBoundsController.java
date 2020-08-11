@@ -34,19 +34,16 @@ public class SpuBoundsController {
      * 列表
      */
     @RequestMapping("/list")
-    //@RequiresPermissions("coupon:spubounds:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = spuBoundsService.queryPage(params);
 
         return R.ok().put("page", page);
     }
 
-
     /**
      * 信息
      */
     @RequestMapping("/info/{id}")
-    //@RequiresPermissions("coupon:spubounds:info")
     public R info(@PathVariable("id") Long id){
 		SpuBoundsEntity spuBounds = spuBoundsService.getById(id);
 
@@ -57,7 +54,6 @@ public class SpuBoundsController {
      * 保存
      */
     @RequestMapping("/save")
-    //@RequiresPermissions("coupon:spubounds:save")
     public R save(@RequestBody SpuBoundsEntity spuBounds){
 		spuBoundsService.save(spuBounds);
 

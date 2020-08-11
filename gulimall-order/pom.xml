@@ -24,6 +24,12 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!--SpringCloudAlibaba的seata分布式事务管理(注意与安装的seata版本一致)-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-seata</artifactId>
+        </dependency>
+
         <!--springSession使用redis来完成session共享-->
         <dependency>
             <groupId>org.springframework.session</groupId>

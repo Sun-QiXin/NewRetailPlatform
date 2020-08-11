@@ -13,6 +13,7 @@ import gulimall.product.feign.WareFeignService;
 import gulimall.product.service.*;
 import gulimall.common.to.SkuHasStockVo;
 import gulimall.product.vo.SpuSaveVo;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,11 +76,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     /**
      * 多表多库保存操作
-     * //TODO 后面使用seata分布式事务
      *
-     * @param spuSaveVo
+     * @param spuSaveVo spuSaveVo
      */
-    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional
     @Override
     public void saveSpuInfo(SpuSaveVo spuSaveVo) {
         //1、保存spu基本信息 pms_spu_info
