@@ -10,7 +10,7 @@ import lombok.Data;
 
 /**
  * 订单
- * 
+ *
  * @author SunQiXin
  * @email 15153869872@163.com
  * @date 2020-07-13 10:31:21
@@ -82,7 +82,7 @@ public class OrderEntity implements Serializable {
 	 */
 	private Integer sourceType;
 	/**
-	 * 订单状态【0->待付款；1->待发货；2->已发货；3->已完成；4->已关闭；5->无效订单】
+	 * 订单状态【0->待付款；1->已付款；2->已发货；3->已完成；4->已取消；5->售后中；6->售后完成】
 	 */
 	private Integer status;
 	/**

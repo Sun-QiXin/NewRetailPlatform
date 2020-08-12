@@ -33,7 +33,7 @@ management:
 seata:
   enabled: true
   application-id: gulimall-coupon #服务唯一id,使用当前服务名称即可
-  tx-service-group: my_test_tx_group #service.vgroupMapping后面跟着的名字
+  tx-service-group: gulimall-coupon-group #service.vgroupMapping后面跟着的名字
   enable-auto-data-source-proxy: true #自动数据源代理
   config: #配置中心的相关配置
     type: nacos

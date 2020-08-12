@@ -47,12 +47,11 @@ public class WareSkuController {
      */
     @PostMapping("/lock/order")
     public R orderLockStock(@RequestBody WareSkuLockVo wareSkuLockVo){
-        Boolean flag = null;
         try {
-            flag = wareSkuService.orderLockStock(wareSkuLockVo);
+            wareSkuService.orderLockStock(wareSkuLockVo);
             return R.ok();
         } catch (Exception e) {
-            return R.error(BizCodeEnume.NO_STOCK_EXCEPTION.getCode(),BizCodeEnume.NO_STOCK_EXCEPTION.getMsg());
+            return R.error(BizCodeEnume.NO_STOCK_EXCEPTION.getCode(),e.getMessage());
         }
     }
 

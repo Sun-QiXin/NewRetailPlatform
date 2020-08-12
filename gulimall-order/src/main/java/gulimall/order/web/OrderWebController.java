@@ -57,15 +57,8 @@ public class OrderWebController {
             } else {
                 //返回结算页并显示失败原因
                 String msg = "";
-                switch (submitOrderResponseVo.getCode()) {
-                    case 1:
-                        msg = "下单失败，请重新提交订单！";
-                        break;
-                    case 2:
-                        msg = "下单失败，没有库存了";
-                        break;
-                    default:
-                        break;
+                if (submitOrderResponseVo.getCode() == 1) {
+                    msg = "下单失败，请刷新后重新提交订单！";
                 }
                 redirectAttributes.addFlashAttribute("submitOrderErrorMsg", msg);
                 return "redirect:http://order.gulimall.com/toTrade";

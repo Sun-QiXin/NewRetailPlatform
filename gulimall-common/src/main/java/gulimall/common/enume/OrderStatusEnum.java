@@ -1,4 +1,8 @@
-package gulimall.order.enume;
+package gulimall.common.enume;
+
+/**
+ * @author x3626
+ */
 
 public enum  OrderStatusEnum {
     CREATE_NEW(0,"待付款"),

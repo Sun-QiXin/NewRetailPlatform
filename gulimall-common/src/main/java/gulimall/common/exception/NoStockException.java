@@ -9,22 +9,22 @@ public class NoStockException extends RuntimeException {
     /**
      * 商品的ID
      */
-    private Long skuId;
+    private String skuName;
 
     /**
      * Constructs a new runtime exception with {@code null} as its
      * detail message.  The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      */
-    public NoStockException(Long skuId) {
-        super("skuId为" + skuId + "的商品没有足够的库存了");
+    public NoStockException(String skuName) {
+        super(skuName + "没有足够的库存了");
     }
 
-    public Long getSkuId() {
-        return skuId;
+    public String getSkuName() {
+        return skuName;
     }
 
-    public void setSkuId(Long skuId) {
-        this.skuId = skuId;
+    public void setSkuName(String skuName) {
+        this.skuName = skuName;
     }
 }

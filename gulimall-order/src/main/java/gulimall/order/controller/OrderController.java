@@ -36,23 +36,15 @@ public class OrderController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @GetMapping("/sendMsg")
-    public R testRabbitMq(){
-        /*
-         * 发送消息
-         * 参数一：交换机名称
-         * 参数二：路由key
-         * 参数三：发送的消息
-         * 如果发送的消息是个对象，默认会使用序列化机制，将对象写出去。对象必须实现serializable,
-         * 可以配置为json
-         */
-        OrderReturnReasonEntity orderReturnReasonEntity = new OrderReturnReasonEntity();
-        orderReturnReasonEntity.setCreateTime(new Date());
-        orderReturnReasonEntity.setName("麻辣粉可容纳付款啦");
-        orderReturnReasonEntity.setId(111L);
-
-        rabbitTemplate.convertAndSend("hello-java-exchane","hello-java-queue",orderReturnReasonEntity,new CorrelationData(UUID.randomUUID().toString()));
-        return R.ok();
+    /**
+     * 根据订单号获取订单的详细信息
+     * @param orderSn 订单号
+     * @return 订单的详细信息
+     */
+    @GetMapping("/orderInfo/{orderSn}")
+    public R getOrder(@PathVariable("orderSn") String orderSn){
+        OrderEntity orderEntity = orderService.getOrderByOrderSn(orderSn);
+        return R.ok().setData(orderEntity);
     }
 
     /**

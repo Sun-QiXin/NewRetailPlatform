@@ -1,5 +1,7 @@
 package gulimall.ware.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -9,11 +11,16 @@ import java.util.List;
  * <br>FileName: SkuWareHasStock
  * <br>Date: 2020/08/10 16:33:21
  */
+@Data
 public class SkuWareHasStockVo implements Serializable {
     /**
      * 商品Id
      */
     private Long skuId;
+    /**
+     * 商品名字
+     */
+    private String skuName;
     /**
      * 锁定商品的数量
      */
@@ -22,28 +29,4 @@ public class SkuWareHasStockVo implements Serializable {
      * 仓库列表
      */
     private List<Long> wareIds;
-
-    public Long getSkuId() {
-        return skuId;
-    }
-
-    public void setSkuId(Long skuId) {
-        this.skuId = skuId;
-    }
-
-    public List<Long> getWareIds() {
-        return wareIds;
-    }
-
-    public void setWareIds(List<Long> wareIds) {
-        this.wareIds = wareIds;
-    }
-
-    public Integer getNum() {
-        return num;
-    }
-
-    public void setNum(Integer num) {
-        this.num = num;
-    }
 }
