@@ -10,7 +10,7 @@ import gulimall.common.vo.ShoppingCart;
 import gulimall.common.vo.ShoppingCartItem;
 import gulimall.order.constant.OrderConstant;
 import gulimall.order.entity.OrderItemEntity;
-import gulimall.order.enume.OrderStatusEnum;
+import gulimall.common.enume.OrderStatusEnum;
 import gulimall.order.feign.MemberFeignService;
 import gulimall.order.feign.ProductFeignService;
 import gulimall.order.feign.ShoppingCartFeignService;
@@ -230,14 +230,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 submitOrderResponseVo.setOrderEntity(createOrder().getOrderEntity());
             } else {
                 //锁定失败,抛出异常
-                submitOrderResponseVo.setCode(2);
-                throw new NoStockException(3L);
+                throw new NoStockException(r.get("msg").toString());
             }
         } else {
             //不通过
             submitOrderResponseVo.setCode(1);
         }
         return submitOrderResponseVo;
+    }
+
+    /**
+     * 根据订单号获取订单的详细信息
+     *
+     * @param orderSn 订单号
+     * @return 订单的详细信息
+     */
+    @Override
+    public OrderEntity getOrderByOrderSn(String orderSn) {
+        return this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
     }
 
     /**
@@ -341,6 +351,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         //14、设置会员id
         orderEntity.setMemberId(memberRespVo.getId());
+
+        //15、设置订单创建时间
+        orderEntity.setCreateTime(new Date());
 
         return orderEntity;
     }

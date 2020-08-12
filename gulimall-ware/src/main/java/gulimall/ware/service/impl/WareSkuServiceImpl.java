@@ -1,15 +1,27 @@
 package gulimall.ware.service.impl;
 
 import gulimall.common.to.SkuHasStockVo;
+import gulimall.common.to.mq.StockLockedDetailTo;
+import gulimall.common.to.mq.StockLockedTo;
 import gulimall.common.utils.R;
 import gulimall.common.exception.NoStockException;
+import gulimall.ware.config.MyRabbitMqConfig;
+import gulimall.ware.entity.WareOrderTaskDetailEntity;
+import gulimall.ware.entity.WareOrderTaskEntity;
 import gulimall.ware.feign.ProductFeignService;
+import gulimall.ware.service.WareOrderTaskDetailService;
+import gulimall.ware.service.WareOrderTaskService;
 import gulimall.ware.vo.OrderItemVo;
+
 import gulimall.ware.vo.SkuWareHasStockVo;
 import gulimall.ware.vo.WareSkuLockVo;
 import org.apache.commons.lang.StringUtils;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Map;
@@ -26,12 +38,23 @@ import gulimall.ware.entity.WareSkuEntity;
 import gulimall.ware.service.WareSkuService;
 import org.springframework.transaction.annotation.Transactional;
 
-
+/**
+ * @author x3626
+ */
 @Service("wareSkuService")
 public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> implements WareSkuService {
 
     @Autowired
     private ProductFeignService productFeignService;
+
+    @Autowired
+    private WareOrderTaskDetailService wareOrderTaskDetailService;
+
+    @Autowired
+    private WareOrderTaskService wareOrderTaskService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     /**
@@ -124,19 +147,25 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean orderLockStock(WareSkuLockVo wareSkuLockVo) {
+        //1、保存库存工作单的详情(用于追溯)
+        WareOrderTaskEntity wareOrderTaskEntity = new WareOrderTaskEntity();
+        wareOrderTaskEntity.setOrderSn(wareSkuLockVo.getOrderSn());
+        wareOrderTaskService.save(wareOrderTaskEntity);
+
         List<OrderItemVo> orderItemVos = wareSkuLockVo.getOrderItemVos();
-        //1、找到每个商品在哪个仓库都有库存
+        //2、找到每个商品在哪个仓库都有库存
         List<SkuWareHasStockVo> wareHasStockVos = orderItemVos.stream().map(item -> {
             Long skuId = item.getSkuId();
             SkuWareHasStockVo wareHasStockVo = new SkuWareHasStockVo();
             wareHasStockVo.setSkuId(skuId);
+            wareHasStockVo.setSkuName(item.getTitle());
             wareHasStockVo.setNum(item.getCount());
             List<Long> wareIds = this.baseMapper.listWareIdHasSkuStock(skuId);
             wareHasStockVo.setWareIds(wareIds);
             return wareHasStockVo;
         }).collect(Collectors.toList());
 
-        //2、锁定库存
+        //3、锁定库存
         for (SkuWareHasStockVo wareHasStockVo : wareHasStockVos) {
             boolean skuStocked = false;
             Long skuId = wareHasStockVo.getSkuId();
@@ -144,7 +173,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             List<Long> wareIds = wareHasStockVo.getWareIds();
             if (wareIds == null || wareIds.size() == 0) {
                 //没有仓库有该商品的库存
-                throw new NoStockException(skuId);
+                throw new NoStockException(wareHasStockVo.getSkuName());
             }
             for (Long wareId : wareIds) {
                 //锁定库存
@@ -152,15 +181,49 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                 if (count == 1) {
                     //锁定成功
                     skuStocked = true;
+                    //1) 保存锁定成功的详情
+                    WareOrderTaskDetailEntity taskDetailEntity = new WareOrderTaskDetailEntity();
+                    taskDetailEntity.setLockStatus(1);
+                    taskDetailEntity.setSkuId(skuId);
+                    taskDetailEntity.setSkuName(wareHasStockVo.getSkuName());
+                    taskDetailEntity.setWareId(wareId);
+                    taskDetailEntity.setTaskId(wareOrderTaskEntity.getId());
+                    taskDetailEntity.setSkuNum(num);
+                    wareOrderTaskDetailService.save(taskDetailEntity);
+
+                    //2) 向RabbitMQ发送库存锁定成功的消息
+                    StockLockedTo stockLockedTo = new StockLockedTo();
+                    StockLockedDetailTo stockLockedDetailTo = new StockLockedDetailTo();
+                    BeanUtils.copyProperties(taskDetailEntity, stockLockedDetailTo);
+                    stockLockedTo.setTaskId(wareOrderTaskEntity.getId());
+                    stockLockedTo.setLockedDetailTo(stockLockedDetailTo);
+                    rabbitTemplate.convertAndSend(MyRabbitMqConfig.WARE_EVENT_EXCHANGE, MyRabbitMqConfig.WARE_DELAY_KEY, stockLockedTo);
                     break;
                 }
                 //当前仓库锁定失败，重试下一个仓库
             }
             if (!skuStocked) {
-                //当前遍历的商品全部扣减库存失败
-                throw new NoStockException(skuId);
+                //当前遍历的商品从所有仓库扣减库存失败(一个扣减失败导致数据全部回滚抛出异常)
+                throw new NoStockException(wareHasStockVo.getSkuName());
             }
         }
         return true;
+    }
+
+    /**
+     * 操作数据库解锁库存
+     *
+     * @param lockedDetailTo lockedDetailTo
+     */
+    @Override
+    public void unLockStock(StockLockedDetailTo lockedDetailTo) {
+        //1、解锁库存
+        this.baseMapper.unLockStock(lockedDetailTo);
+        //2、更新详情工作单的状态
+        WareOrderTaskDetailEntity wareOrderTaskDetailEntity = new WareOrderTaskDetailEntity();
+        BeanUtils.copyProperties(lockedDetailTo, wareOrderTaskDetailEntity);
+        //变为2已解锁状态
+        wareOrderTaskDetailEntity.setLockStatus(2);
+        wareOrderTaskDetailService.updateById(wareOrderTaskDetailEntity);
     }
 }

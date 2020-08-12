@@ -1,14 +1,14 @@
 package gulimall.order.interceptor;
 
 import gulimall.common.constant.AuthServerConstant;
-import gulimall.common.constant.ShoppingCartConstant;
+
 import gulimall.common.vo.MemberRespVo;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -38,6 +38,14 @@ public class LoginUserInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        //服务之间互相调用,默认会拦截,需要手动匹配路径放行
+        String uri = request.getRequestURI();
+        boolean isMatch = new AntPathMatcher().match("/order/order/orderInfo/**", uri);
+        if (isMatch){
+            //放行
+            return true;
+        }
+
         HttpSession session = request.getSession();
         MemberRespVo memberRespVo = (MemberRespVo) session.getAttribute(AuthServerConstant.LOGIN_USER);
         if (memberRespVo != null) {

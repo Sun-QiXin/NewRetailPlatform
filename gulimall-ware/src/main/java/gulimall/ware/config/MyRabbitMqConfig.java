@@ -1,10 +1,8 @@
-package gulimall.order.config;
+package gulimall.ware.config;
 
 import org.springframework.amqp.core.*;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 
 /**
  * rabbitMq的队列交换机配置
@@ -17,31 +15,31 @@ public class MyRabbitMqConfig {
     /**
      * 交换机名称
      */
-    public static final String ORDER_EVENT_EXCHANGE = "order_event_exchange";
+    public static final String WARE_EVENT_EXCHANGE = "ware_event_exchange";
     /**
      * 延时队列名称
      */
-    public static final String ORDER_DELAY_QUEUE= "order_delay_queue";
+    public static final String WARE_DELAY_QUEUE= "ware_delay_queue";
     /**
      * 死信队列名称
      */
-    public static final String ORDER_DEAD_QUEUE= "order_dead_queue";
+    public static final String WARE_DEAD_QUEUE= "ware_dead_queue";
     /**
      * 路由到延时队列使用的路由键
      */
-    public static final String ORDER_DELAY_KEY= "order_create_order";
+    public static final String WARE_DELAY_KEY= "ware_locked";
     /**
      * 路由到死信队列使用的路由键
      */
-    public static final String ORDER_DEAD_KEY = "order_dead_key";
+    public static final String WARE_DEAD_KEY = "ware_dead.#";
 
     /**
      * 创建一个交换机
      * @return 交换机
      */
     @Bean
-    public Exchange orderEventExchange(){
-        return ExchangeBuilder.topicExchange(ORDER_EVENT_EXCHANGE).durable(true).build();
+    public Exchange wareEventExchange(){
+        return ExchangeBuilder.topicExchange(WARE_EVENT_EXCHANGE).durable(true).build();
     }
 
     /**
@@ -49,8 +47,8 @@ public class MyRabbitMqConfig {
      * @return 延时队列
      */
     @Bean
-    public Queue orderDelayQueue(){
-        return QueueBuilder.durable(ORDER_DELAY_QUEUE).ttl(60000).deadLetterExchange(ORDER_EVENT_EXCHANGE).deadLetterRoutingKey(ORDER_DEAD_KEY).build();
+    public Queue wareDelayQueue(){
+        return QueueBuilder.durable(WARE_DELAY_QUEUE).ttl(120000).deadLetterExchange(WARE_EVENT_EXCHANGE).deadLetterRoutingKey(WARE_DEAD_KEY).build();
     }
 
     /**
@@ -58,8 +56,8 @@ public class MyRabbitMqConfig {
      * @return 死信队列
      */
     @Bean
-    public Queue orderDeadQueue(){
-        return QueueBuilder.durable(ORDER_DEAD_QUEUE).build();
+    public Queue wareDeadQueue(){
+        return QueueBuilder.durable(WARE_DEAD_QUEUE).build();
     }
 
     /**
@@ -68,7 +66,7 @@ public class MyRabbitMqConfig {
      */
     @Bean
     public Binding bindingDelayQueue(){
-        return new Binding(ORDER_DELAY_QUEUE, Binding.DestinationType.QUEUE,ORDER_EVENT_EXCHANGE,ORDER_DELAY_KEY,null);
+        return new Binding(WARE_DELAY_QUEUE, Binding.DestinationType.QUEUE,WARE_EVENT_EXCHANGE,WARE_DELAY_KEY,null);
     }
 
     /**
@@ -77,6 +75,6 @@ public class MyRabbitMqConfig {
      */
     @Bean
     public Binding bindingDeadQueue(){
-        return new Binding(ORDER_DEAD_QUEUE, Binding.DestinationType.QUEUE,ORDER_EVENT_EXCHANGE,ORDER_DEAD_KEY,null);
+        return new Binding(WARE_DEAD_QUEUE, Binding.DestinationType.QUEUE,WARE_EVENT_EXCHANGE,WARE_DEAD_KEY,null);
     }
 }

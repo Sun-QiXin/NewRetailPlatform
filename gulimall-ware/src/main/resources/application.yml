@@ -12,6 +12,21 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
 
+  #配置RabbitMQ
+  rabbitmq:
+    host: 192.168.200.132
+    port: 5672
+    virtual-host: /gulimall #虚拟主机名称
+    username: admin
+    password: 362623
+    publisher-confirm-type: simple  #开启消息发送到服务端确认回调
+    publisher-returns: true #开启消息抵达队列返回回调
+    template:
+      mandatory: true #只要抵达队列，以异步发送优先回调我们这个returnConfirm
+    listener:
+      simple:
+        acknowledge-mode: manual  #开始手动确认消息
+
 #配置mybatis-plus
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml  #mapper文件位置
@@ -36,7 +51,7 @@ management:
 seata:
   enabled: true
   application-id: gulimall-ware #服务唯一id,使用当前服务名称即可
-  tx-service-group: my_test_tx_group #service.vgroupMapping后面跟着的名字
+  tx-service-group: gulimall-ware-group #service.vgroupMapping后面跟着的名字
   enable-auto-data-source-proxy: true #自动数据源代理
   config: #配置中心的相关配置
     type: nacos

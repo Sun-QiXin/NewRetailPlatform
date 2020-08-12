@@ -2,6 +2,7 @@ package gulimall.ware.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import gulimall.common.to.SkuHasStockVo;
+import gulimall.common.to.mq.StockLockedDetailTo;
 import gulimall.common.utils.PageUtils;
 import gulimall.ware.entity.WareSkuEntity;
 import gulimall.ware.vo.LockStockResultVo;
@@ -47,5 +48,12 @@ public interface WareSkuService extends IService<WareSkuEntity> {
      * @return 是否锁定成功
      */
     Boolean orderLockStock(WareSkuLockVo wareSkuLockVo);
+
+    /**
+     * 操作数据库解锁库存
+     *
+     * @param lockedDetailTo lockedDetailTo
+     */
+    void unLockStock(StockLockedDetailTo lockedDetailTo);
 }
 
