@@ -17,23 +17,23 @@ public class MyRabbitMqConfig {
     /**
      * 交换机名称
      */
-    public static final String ORDER_EVENT_EXCHANGE = "order_event_exchange";
+    public static final String ORDER_EVENT_EXCHANGE = "order.event.exchange";
     /**
      * 延时队列名称
      */
-    public static final String ORDER_DELAY_QUEUE= "order_delay_queue";
+    public static final String ORDER_DELAY_QUEUE= "order.delay.queue";
     /**
      * 死信队列名称
      */
-    public static final String ORDER_DEAD_QUEUE= "order_dead_queue";
+    public static final String ORDER_DEAD_QUEUE= "order.dead.queue";
     /**
      * 路由到延时队列使用的路由键
      */
-    public static final String ORDER_DELAY_KEY= "order_create_order";
+    public static final String ORDER_DELAY_KEY= "order.create.order";
     /**
      * 路由到死信队列使用的路由键
      */
-    public static final String ORDER_DEAD_KEY = "order_dead_key";
+    public static final String ORDER_DEAD_KEY = "order.dead.key";
 
     /**
      * 创建一个交换机
@@ -45,7 +45,7 @@ public class MyRabbitMqConfig {
     }
 
     /**
-     * 创建一个延时队列
+     * 创建一个延时队列(延时30分钟)
      * @return 延时队列
      */
     @Bean
@@ -78,5 +78,14 @@ public class MyRabbitMqConfig {
     @Bean
     public Binding bindingDeadQueue(){
         return new Binding(ORDER_DEAD_QUEUE, Binding.DestinationType.QUEUE,ORDER_EVENT_EXCHANGE,ORDER_DEAD_KEY,null);
+    }
+
+    /**
+     * 将订单服务的交换机和库存服务的死信队列绑定（出现网络不通畅等问题解锁库存比关闭订单慢了，那就可以使用该绑定再次发送一次消息，直接到达解锁库存）
+     * @return Binding
+     */
+    @Bean
+    public Binding bindingWareDeadQueue(){
+        return new Binding("ware.dead.queue", Binding.DestinationType.QUEUE,ORDER_EVENT_EXCHANGE,"ware.dead.#",null);
     }
 }

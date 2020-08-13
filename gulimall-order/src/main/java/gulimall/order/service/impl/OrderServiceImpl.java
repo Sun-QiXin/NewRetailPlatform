@@ -2,12 +2,15 @@ package gulimall.order.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+
 import gulimall.common.exception.NoStockException;
 import gulimall.common.to.SkuHasStockVo;
+import gulimall.common.to.mq.OrderTo;
 import gulimall.common.utils.R;
 import gulimall.common.vo.MemberRespVo;
 import gulimall.common.vo.ShoppingCart;
 import gulimall.common.vo.ShoppingCartItem;
+import gulimall.order.config.MyRabbitMqConfig;
 import gulimall.order.constant.OrderConstant;
 import gulimall.order.entity.OrderItemEntity;
 import gulimall.common.enume.OrderStatusEnum;
@@ -19,6 +22,8 @@ import gulimall.order.interceptor.LoginUserInterceptor;
 import gulimall.order.service.OrderItemService;
 import gulimall.order.to.OrderCreateTo;
 import gulimall.order.vo.*;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -71,6 +76,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private OrderItemService orderItemService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Autowired
     private ThreadPoolExecutor executor;
@@ -228,6 +236,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             if (r.getCode() == 0) {
                 //锁定成功
                 submitOrderResponseVo.setOrderEntity(createOrder().getOrderEntity());
+                //订单创建成功，给mq发送创建成功的消息
+                rabbitTemplate.convertAndSend(MyRabbitMqConfig.ORDER_EVENT_EXCHANGE, MyRabbitMqConfig.ORDER_DELAY_KEY, orderCreateTo.getOrderEntity(), new CorrelationData(UUID.randomUUID().toString()));
             } else {
                 //锁定失败,抛出异常
                 throw new NoStockException(r.get("msg").toString());
@@ -248,6 +258,27 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     @Override
     public OrderEntity getOrderByOrderSn(String orderSn) {
         return this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+    }
+
+    /**
+     * 关闭订单
+     *
+     * @param orderEntity orderEntity
+     */
+    @Override
+    public void closeOrder(OrderEntity orderEntity) {
+        //1、查询当前订单的最新状态
+        OrderEntity newOrder = this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderEntity.getOrderSn()));
+        if (newOrder != null && newOrder.getStatus().equals(OrderStatusEnum.CREATE_NEW.getCode())) {
+            //2、关闭订单(更改订单状态为已取消)
+            newOrder.setStatus(OrderStatusEnum.CANCLED.getCode());
+            this.updateById(newOrder);
+
+            //3、<br>防止网络延迟等问题导致库存服务解锁库存时关闭订单被阻塞或没执行完查询一直是待付款状态，库存一直解锁不了
+            OrderTo orderTo = new OrderTo();
+            BeanUtils.copyProperties(newOrder, orderTo);
+            rabbitTemplate.convertAndSend(MyRabbitMqConfig.ORDER_EVENT_EXCHANGE, "ware.dead.order", orderTo, new CorrelationData(UUID.randomUUID().toString()));
+        }
     }
 
     /**

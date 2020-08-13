@@ -1,6 +1,7 @@
 package gulimall.ware.dao;
 
 import gulimall.common.to.mq.StockLockedDetailTo;
+import gulimall.ware.entity.WareOrderTaskDetailEntity;
 import gulimall.ware.entity.WareSkuEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -53,5 +54,5 @@ public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
      * 操作数据库解锁库存
      * @param lockedDetailTo lockedDetailTo
      */
-    void unLockStock(@Param("lockedDetailTo") StockLockedDetailTo lockedDetailTo);
+    void unLockStock(@Param("orderTaskDetailEntity") WareOrderTaskDetailEntity orderTaskDetailEntity);
 }
