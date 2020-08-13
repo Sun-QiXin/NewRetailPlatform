@@ -15,23 +15,23 @@ public class MyRabbitMqConfig {
     /**
      * 交换机名称
      */
-    public static final String WARE_EVENT_EXCHANGE = "ware_event_exchange";
+    public static final String WARE_EVENT_EXCHANGE = "ware.event.exchange";
     /**
      * 延时队列名称
      */
-    public static final String WARE_DELAY_QUEUE= "ware_delay_queue";
+    public static final String WARE_DELAY_QUEUE= "ware.delay.queue";
     /**
      * 死信队列名称
      */
-    public static final String WARE_DEAD_QUEUE= "ware_dead_queue";
+    public static final String WARE_DEAD_QUEUE= "ware.dead.queue";
     /**
      * 路由到延时队列使用的路由键
      */
-    public static final String WARE_DELAY_KEY= "ware_locked";
+    public static final String WARE_DELAY_KEY= "ware.locked";
     /**
      * 路由到死信队列使用的路由键
      */
-    public static final String WARE_DEAD_KEY = "ware_dead.#";
+    public static final String WARE_DEAD_KEY = "ware.dead.#";
 
     /**
      * 创建一个交换机
@@ -43,12 +43,12 @@ public class MyRabbitMqConfig {
     }
 
     /**
-     * 创建一个延时队列
+     * 创建一个延时队列(延时40分钟)
      * @return 延时队列
      */
     @Bean
     public Queue wareDelayQueue(){
-        return QueueBuilder.durable(WARE_DELAY_QUEUE).ttl(120000).deadLetterExchange(WARE_EVENT_EXCHANGE).deadLetterRoutingKey(WARE_DEAD_KEY).build();
+        return QueueBuilder.durable(WARE_DELAY_QUEUE).ttl(100000).deadLetterExchange(WARE_EVENT_EXCHANGE).deadLetterRoutingKey(WARE_DEAD_KEY).build();
     }
 
     /**
