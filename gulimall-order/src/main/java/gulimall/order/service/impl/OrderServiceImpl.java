@@ -235,7 +235,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             R r = wareFeignService.orderLockStock(wareSkuLockVo);
             if (r.getCode() == 0) {
                 //锁定成功
-                submitOrderResponseVo.setOrderEntity(createOrder().getOrderEntity());
+                submitOrderResponseVo.setOrderEntity(orderCreateTo.getOrderEntity());
                 //订单创建成功，给mq发送创建成功的消息
                 rabbitTemplate.convertAndSend(MyRabbitMqConfig.ORDER_EVENT_EXCHANGE, MyRabbitMqConfig.ORDER_DELAY_KEY, orderCreateTo.getOrderEntity(), new CorrelationData(UUID.randomUUID().toString()));
             } else {
@@ -279,6 +279,34 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             BeanUtils.copyProperties(newOrder, orderTo);
             rabbitTemplate.convertAndSend(MyRabbitMqConfig.ORDER_EVENT_EXCHANGE, "ware.dead.order", orderTo, new CorrelationData(UUID.randomUUID().toString()));
         }
+    }
+
+    /**
+     * 根据订单号查询需要的信息
+     *
+     * @param orderSn 订单号
+     * @return PayVo
+     */
+    @Override
+    public PayVo getOrderPayInfo(String orderSn) {
+        PayVo payVo = null;
+        //1、查询订单信息封装至payVo
+        OrderEntity orderEntity = this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+        if (!OrderStatusEnum.CANCLED.getCode().equals(orderEntity.getStatus())) {
+            //没超过支付时间
+            payVo = new PayVo();
+            payVo.setOut_trade_no(orderEntity.getOrderSn());
+            //精确至小数点后两位（支付宝支付要求）,后面向上取值
+            BigDecimal totalAmount = orderEntity.getTotalAmount().setScale(2, BigDecimal.ROUND_UP);
+            payVo.setTotal_amount(totalAmount.toString());
+
+            //2、查询订单项信息
+            List<OrderItemEntity> orderItemEntities = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", orderSn));
+            OrderItemEntity orderItemEntity = orderItemEntities.get(0);
+            payVo.setSubject(orderItemEntity.getSkuName());
+            payVo.setBody(orderItemEntity.getSkuAttrsVals());
+        }
+        return payVo;
     }
 
     /**

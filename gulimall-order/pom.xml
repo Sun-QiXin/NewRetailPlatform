@@ -24,6 +24,13 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!--支付宝支付依赖-->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.10.90.ALL</version>
+        </dependency>
+
         <!--SpringCloudAlibaba的seata分布式事务管理(注意与安装的seata版本一致)-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
