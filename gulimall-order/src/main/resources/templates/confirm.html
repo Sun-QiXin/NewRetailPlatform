@@ -339,6 +339,16 @@
     <p th:text="${submitOrderErrorMsg}">谷粒学院自提</p>
 </div>
 
+<div style="    height: 20px;
+    background: #E4393C;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+    line-height: 20px;
+    font-size: 12px;" th:if="${session.orderOvertimeMsg!=null}">
+    <p th:text="${session.orderOvertimeMsg}">谷粒学院自提</p>
+</div>
+
 <!--logo图片-->
 <div class="top-1" style="">
     <a href="http://gulimall.com"><img src="/static/order/confirm/img/logo1.jpg" class="img1"/></a><span>结算页</span>
@@ -796,6 +806,9 @@
             /*发送请求更改默认地址为当前选中的*/
             location.href = `http://order.gulimall.com/updateAddress?memberId=${memberId}&addressId=${addressId}&defaultStatus=1`;
         })
+
+        /*发送请求删除订单超时的session*/
+        $.get("/deleteOrderOvertimeMsg");
     })
 </script>
 </body>

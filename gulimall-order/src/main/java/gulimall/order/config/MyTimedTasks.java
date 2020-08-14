@@ -35,7 +35,7 @@ public class MyTimedTasks {
     /**
      * 每隔一段时间检索数据库，查看有没有发送失败的mq消息，如果有就重新发送
      */
-    @Scheduled(fixedDelay = 60000 * 2)
+    @Scheduled(fixedDelay = 60000 * 60)
     public void resendFailMessage() {
         //1、拿到所有状态为错误抵达的消息
         List<MqMessageEntity> mqMessageEntities = mqMessageService.list(new QueryWrapper<MqMessageEntity>().eq("message_status", 1));

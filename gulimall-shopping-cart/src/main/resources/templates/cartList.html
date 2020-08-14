@@ -655,7 +655,7 @@
         }
         $(this).next("span").html(jian);
         /*发送请求更新商品件数*/
-        if (jian > 1) {
+        if (jian >= 1) {
             location.href = `http://cart.gulimall.com/countItem?skuId=${skuId}&count=${jian}`;
         }
     })
