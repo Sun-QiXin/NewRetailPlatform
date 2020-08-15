@@ -310,6 +310,47 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     }
 
     /**
+     * 支付成功后支付宝也会默认访问该请求
+     * <br>查询出已经支付的订单信息
+     *
+     * @param params 查询参数
+     * @return 订单数据
+     */
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+        MemberRespVo memberRespVo = LoginUserInterceptor.threadLocal.get();
+
+        //1、设置默认每页显示条数
+        String limit = (String) params.get("limit");
+        if (StringUtils.isEmpty(limit)) {
+            params.put("limit", 5);
+        }
+
+        QueryWrapper<OrderEntity> wrapper = new QueryWrapper<OrderEntity>().eq("member_id", memberRespVo.getId()).orderByDesc("id");
+
+        //2、设置按照状态的检索条件
+        String status = (String) params.get("status");
+        if (!StringUtils.isEmpty(status)) {
+            wrapper.eq("status", status);
+        }
+
+        //3、获取当前登录用户可用于显示的订单信息
+        IPage<OrderEntity> page = this.page(new Query<OrderEntity>().getPage(params), wrapper);
+
+        if (page != null && page.getRecords().size() > 0) {
+            //4、获取每一个订单的订单项
+            List<OrderEntity> orderEntities = page.getRecords().stream().peek(orderEntity -> {
+                List<OrderItemEntity> itemEntities = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", orderEntity.getOrderSn()).orderByDesc("id"));
+                orderEntity.setOrderItemEntities(itemEntities);
+            }).collect(Collectors.toList());
+            page.setRecords(orderEntities);
+            return new PageUtils(page);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * 保存订单数据至数据库
      *
      * @param orderCreateTo orderCreateTo

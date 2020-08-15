@@ -33,10 +33,10 @@ public class Query<T> {
         long limit = 10;
 
         if(params.get(Constant.PAGE) != null){
-            curPage = Long.parseLong((String)params.get(Constant.PAGE));
+            curPage = Long.parseLong((params.get(Constant.PAGE).toString()));
         }
         if(params.get(Constant.LIMIT) != null){
-            limit = Long.parseLong((String)params.get(Constant.LIMIT));
+            limit = Long.parseLong(params.get(Constant.LIMIT).toString());
         }
 
         //分页对象

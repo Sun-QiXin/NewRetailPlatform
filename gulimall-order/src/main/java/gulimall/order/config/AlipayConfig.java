@@ -20,34 +20,34 @@ public class AlipayConfig {
     /**
      * 应用ID,您的APPID，收款账号既是您的APPID对应支付宝账号
      */
-    public String appId;
+    public String app_id;
 
     /**
      * 商户私钥，您的PKCS8格式RSA2私钥
      */
-    public String merchantPrivateKey;
+    public String merchant_private_key;
 
     /**
      * 支付宝公钥,查看地址：https://openhome.alipay.com/platform/keyManage.htm 对应APPID下的支付宝公钥。
      */
-    public String alipayPublicKey;
+    public String alipay_public_key;
 
     /**
      * <br>服务器[异步通知]页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
      * <br>支付宝会异步的给我们发送一个请求，告诉我们支付成功的信息
      */
-    private String notifyUrl;
+    private String notify_url;
 
     /**
      * <br>页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
      * <br>同步通知，支付成功，一般跳转到成功页
      */
-    private String returnUrl;
+    private String return_url;
 
     /**
      * 签名方式
      */
-    private String signType = "RSA2";
+    private String sign_type = "RSA2";
 
     /**
      * 字符编码格式
@@ -68,15 +68,15 @@ public class AlipayConfig {
     public String pay(PayVo vo) throws AlipayApiException {
         //1、根据支付宝的配置生成一个支付客户端
         AlipayClient alipayClient = new DefaultAlipayClient(gatewayUrl,
-                appId, merchantPrivateKey, "json",
-                charset, alipayPublicKey, signType);
+                app_id, merchant_private_key, "json",
+                charset, alipay_public_key, sign_type);
 
         //2、创建一个支付请求 //设置请求参数
         AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
-        alipayRequest.setReturnUrl(returnUrl);
-        alipayRequest.setNotifyUrl(notifyUrl);
+        alipayRequest.setReturnUrl(return_url);
+        alipayRequest.setNotifyUrl(notify_url);
 
-        //商户订单号，商户网站订单系统中唯一订单号，必填
+        //商户订单号，商户网站订单系统中唯一订单号，必填(属性名不可修改)
         String out_trade_no = vo.getOut_trade_no();
         //付款金额，必填
         String total_amount = vo.getTotal_amount();
