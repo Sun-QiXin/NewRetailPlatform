@@ -65,5 +65,14 @@ public interface OrderService extends IService<OrderEntity> {
      * @return PayVo
      */
     PayVo getOrderPayInfo(String orderSn);
+
+    /**
+     * 支付成功后支付宝也会默认访问该请求
+     * <br>查询出已经支付的订单信息
+     *
+     * @param params 查询参数
+     * @return 订单数据
+     */
+    PageUtils queryPageWithItem(Map<String, Object> params);
 }
 

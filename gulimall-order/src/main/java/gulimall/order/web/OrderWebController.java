@@ -1,6 +1,7 @@
 package gulimall.order.web;
 
 import gulimall.common.exception.NoStockException;
+import gulimall.common.utils.PageUtils;
 import gulimall.order.service.OrderService;
 import gulimall.order.vo.OrderConfirmVo;
 import gulimall.order.vo.OrderSubmitVo;
@@ -11,7 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpSession;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 
@@ -86,5 +87,20 @@ public class OrderWebController {
     public String updateAddress(@RequestParam("memberId") Long memberId, @RequestParam("defaultStatus") Integer defaultStatus, @RequestParam("addressId") Long addressId) {
         orderService.updateAddress(memberId, defaultStatus, addressId);
         return "redirect:http://order.gulimall.com/toTrade";
+    }
+
+    /**
+     * 支付成功后支付宝也会默认访问该请求
+     * <br>分页查询出当前登录用户已经支付的订单信息
+     *
+     * @param model model
+     * @param params 查询参数
+     * @return 订单数据
+     */
+    @GetMapping("/list.html")
+    public String orderListPage(@RequestParam Map<String, Object> params, Model model) {
+        PageUtils page = orderService.queryPageWithItem(params);
+        model.addAttribute("orders",page);
+        return "list";
     }
 }

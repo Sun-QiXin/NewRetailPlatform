@@ -105,7 +105,7 @@
 #  app-id: 2021000118636676
 #  merchant-private-key: 商户私钥
 #  notify-url: http://xb6cg22x28.52http.net/order/pay/alipay/success
-#  return-url: http://localhost:2000/pay/success.html
+#  return-url: http://order.gulimall.com/list.html
 #  sign-type: RSA2
 #  charset: utf-8
 #  gateway-url: https://openapi.alipaydev.com/gateway.do
