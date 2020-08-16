@@ -2,6 +2,7 @@ package gulimall.order.feign;
 
 
 import gulimall.common.utils.R;
+import gulimall.common.vo.MemberRespVo;
 import gulimall.order.vo.MemberAddressVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -46,4 +47,20 @@ public interface MemberFeignService {
      */
     @RequestMapping("/member/memberreceiveaddress/info/{id}")
     R getAddressById(@PathVariable("id") Long id);
+
+    /**
+     * 根据用户id修改用户信息
+     * @param memberRespVo 用户信息
+     * @return R
+     */
+    @RequestMapping("/member/member/update")
+    R updateById(@RequestBody MemberRespVo memberRespVo);
+
+    /**
+     * 根据用户id获取用户信息信息
+     * @param id 用户id
+     * @return R
+     */
+    @RequestMapping("/member/member/info/{id}")
+    R getInfoById(@PathVariable("id") Long id);
 }

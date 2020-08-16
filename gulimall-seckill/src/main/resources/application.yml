@@ -1,0 +1,43 @@
+#以下配置全部是从nacos配置中心读取的
+
+
+spring:
+  #配置数据源
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 362623
+    url: jdbc:mysql://192.168.200.131:3306/gulimall_pms?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss #指定返回日期的格式
+
+  redis:  #配置redis
+    host: 192.168.200.132
+    port: 6379
+
+  thymeleaf:
+    cache: false #关闭页面缓存
+
+  task:
+    execution:
+      pool:
+        core-size: 20 #配置使用 @Async注解 异步任务的核心线程数
+        max-size: 200 #最大线程数
+        queue-capacity: 1000 #队列最大容纳数
+
+#配置mybatis-plus
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml  #mapper文件位置
+  global-config:
+    db-config:
+      id-type: auto #表示使用数据库主键自增
+
+
+#打印sql日志
+logging:
+  level:
+    gulimall:
+      product:
+        dao: debug

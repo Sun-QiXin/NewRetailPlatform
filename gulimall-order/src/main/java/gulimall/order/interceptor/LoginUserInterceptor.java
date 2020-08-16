@@ -40,8 +40,11 @@ public class LoginUserInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //服务之间互相调用,默认会拦截,需要手动匹配路径放行
         String uri = request.getRequestURI();
-        boolean isMatch = new AntPathMatcher().match("/order/order/orderInfo/**", uri);
-        if (isMatch){
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        boolean isMatch1 = pathMatcher.match("/order/order/orderInfo/**", uri);
+        /*支付宝给我们发异步通知肯定不带cookie的所以直接放行*/
+        boolean isMatch2 = pathMatcher.match("/paymentNotifications", uri);
+        if (isMatch1 || isMatch2) {
             //放行
             return true;
         }
@@ -59,7 +62,6 @@ public class LoginUserInterceptor implements HandlerInterceptor {
             return false;
         }
     }
-
 
 
     /**

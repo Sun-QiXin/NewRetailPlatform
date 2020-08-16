@@ -1,11 +1,12 @@
-package gulimall.order.config;
+package gulimall.ware.scheduled;
+
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import gulimall.common.to.mq.OrderTo;
-import gulimall.order.entity.MqMessageEntity;
-import gulimall.order.entity.OrderEntity;
-import gulimall.order.service.MqMessageService;
+import gulimall.common.to.mq.StockLockedTo;
+import gulimall.ware.entity.MqMessageEntity;
+import gulimall.ware.service.MqMessageService;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ import java.util.UUID;
  * 定时任务
  *
  * @author 孙启新
- * <br>FileName: MyTimedTasks
+ * <br>FileName: WareTimedTasks
  * <br>Date: 2020/08/13 15:51:24
  */
 @Component
 @EnableScheduling
-public class MyTimedTasks {
+public class WareTimedTasks {
     @Autowired
     private MqMessageService mqMessageService;
 
@@ -42,17 +43,10 @@ public class MyTimedTasks {
         if (mqMessageEntities != null && mqMessageEntities.size() > 0) {
             for (MqMessageEntity mqMessageEntity : mqMessageEntities) {
                 String classType = mqMessageEntity.getClassType();
-                if ("gulimall.order.entity.OrderEntity".equals(classType)){
-                    OrderEntity orderEntity = JSON.parseObject(mqMessageEntity.getContent(), OrderEntity.class);
+                if ("gulimall.common.to.mq.StockLockedTo".equals(classType)){
+                    StockLockedTo stockLockedTo = JSON.parseObject(mqMessageEntity.getContent(), StockLockedTo.class);
                     //重新发送，指定新的id
-                    rabbitTemplate.convertAndSend(mqMessageEntity.getToExchane(), mqMessageEntity.getRoutingKey(), orderEntity,new CorrelationData(UUID.randomUUID().toString()));
-                    //将当前处理的消息状态改为已送达
-                    mqMessageEntity.setMessageStatus(0);
-                    mqMessageService.updateById(mqMessageEntity);
-                }else if ("gulimall.common.to.mq.OrderTo".equals(classType)){
-                    OrderTo orderTo = JSON.parseObject(mqMessageEntity.getContent(), OrderTo.class);
-                    //重新发送，指定新的id
-                    rabbitTemplate.convertAndSend(mqMessageEntity.getToExchane(), mqMessageEntity.getRoutingKey(), orderTo,new CorrelationData(UUID.randomUUID().toString()));
+                    rabbitTemplate.convertAndSend(mqMessageEntity.getToExchane(), mqMessageEntity.getRoutingKey(), stockLockedTo,new CorrelationData(UUID.randomUUID().toString()));
                     //将当前处理的消息状态改为已送达
                     mqMessageEntity.setMessageStatus(0);
                     mqMessageService.updateById(mqMessageEntity);

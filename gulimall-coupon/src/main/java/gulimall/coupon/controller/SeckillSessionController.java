@@ -31,10 +31,11 @@ public class SeckillSessionController {
     private SeckillSessionService seckillSessionService;
 
     /**
-     * 列表
+     * 根据条件进行分页查询
+     * @param params 参数
+     * @return R
      */
     @RequestMapping("/list")
-    //@RequiresPermissions("coupon:seckillsession:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = seckillSessionService.queryPage(params);
 

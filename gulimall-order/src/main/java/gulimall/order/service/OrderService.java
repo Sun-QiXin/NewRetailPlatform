@@ -1,13 +1,12 @@
 package gulimall.order.service;
 
+import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.extension.service.IService;
 import gulimall.common.utils.PageUtils;
 import gulimall.order.entity.OrderEntity;
-import gulimall.order.vo.OrderConfirmVo;
-import gulimall.order.vo.OrderSubmitVo;
-import gulimall.order.vo.PayVo;
-import gulimall.order.vo.SubmitOrderResponseVo;
+import gulimall.order.vo.*;
 
+import java.text.ParseException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -56,8 +55,9 @@ public interface OrderService extends IService<OrderEntity> {
     /**
      * 关闭订单
      * @param orderEntity orderEntity
+     * @throws AlipayApiException AlipayApiException
      */
-    void closeOrder(OrderEntity orderEntity);
+    void closeOrder(OrderEntity orderEntity) throws AlipayApiException;
 
     /**
      * 根据订单号查询需要的信息
@@ -74,5 +74,12 @@ public interface OrderService extends IService<OrderEntity> {
      * @return 订单数据
      */
     PageUtils queryPageWithItem(Map<String, Object> params);
+
+    /**
+     * 根据支付宝返回的支付成功信息，修改订单的状态
+     * @param payAsyncVo 支付宝通知信息
+     * @return 成功or失败
+     */
+    Boolean handlePayResult(PayAsyncVo payAsyncVo) throws ParseException;
 }
 

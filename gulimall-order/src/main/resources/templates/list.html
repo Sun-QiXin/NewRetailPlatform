@@ -300,7 +300,7 @@
                             </ul>
                         </td>
                         <td th:rowspan="${index.size}"
-                            th:if="${index.index==0&&(order.status!=1||order.status!=2||order.status!=5)}">
+                            th:if="${index.index==0&&(order.status==0||order.status==3||order.status==4||order.status==6)}">
                             <button style="cursor: pointer">查看详情</button>
                         </td>
                         <td th:rowspan="${index.size}"
@@ -314,6 +314,7 @@
             </div>
             <div class="order_btm">
                 <div>
+                    <span style="color: #000;margin-right: 10px">共[[${orders?.totalPage}]]页[[${orders?.totalCount}]]条</span>
                     <button id="previousPage">上一页</button>
                     <span>[[${orders?.currPage}]]</span>
                     <button id="nextPage">下一页</button>

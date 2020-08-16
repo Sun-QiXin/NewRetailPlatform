@@ -92,10 +92,11 @@ public class MemberController {
 
 
     /**
-     * 信息
+     * 根据用户id获取用户信息信息
+     * @param id 用户id
+     * @return R
      */
     @RequestMapping("/info/{id}")
-    //@RequiresPermissions("member:member:info")
     public R info(@PathVariable("id") Long id) {
         MemberEntity member = memberService.getById(id);
 
@@ -114,13 +115,11 @@ public class MemberController {
     }
 
     /**
-     * 修改
+     * 根据用户id修改用户信息
      */
     @RequestMapping("/update")
-    //@RequiresPermissions("member:member:update")
     public R update(@RequestBody MemberEntity member) {
         memberService.updateById(member);
-
         return R.ok();
     }
 

@@ -15,6 +15,11 @@ import java.util.Map;
  */
 public interface SeckillSessionService extends IService<SeckillSessionEntity> {
 
+    /**
+     * 根据条件进行分页查询
+     * @param params 参数
+     * @return PageUtils
+     */
     PageUtils queryPage(Map<String, Object> params);
 }
 

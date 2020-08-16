@@ -11,6 +11,7 @@ import gulimall.common.utils.Query;
 import gulimall.coupon.dao.SeckillSessionDao;
 import gulimall.coupon.entity.SeckillSessionEntity;
 import gulimall.coupon.service.SeckillSessionService;
+import org.springframework.util.StringUtils;
 
 
 @Service("seckillSessionService")
@@ -18,10 +19,14 @@ public class SeckillSessionServiceImpl extends ServiceImpl<SeckillSessionDao, Se
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<SeckillSessionEntity> wrapper = new QueryWrapper<>();
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            wrapper.eq("name", key).or().eq("status", key).or().eq("id", key);
+        }
+
         IPage<SeckillSessionEntity> page = this.page(
-                new Query<SeckillSessionEntity>().getPage(params),
-                new QueryWrapper<SeckillSessionEntity>()
-        );
+                new Query<SeckillSessionEntity>().getPage(params), wrapper);
 
         return new PageUtils(page);
     }
