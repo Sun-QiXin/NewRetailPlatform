@@ -1,6 +1,8 @@
 package gulimall.order.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
+import com.alipay.api.AlipayApiException;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 
 import gulimall.common.exception.NoStockException;
@@ -10,16 +12,20 @@ import gulimall.common.utils.R;
 import gulimall.common.vo.MemberRespVo;
 import gulimall.common.vo.ShoppingCart;
 import gulimall.common.vo.ShoppingCartItem;
+import gulimall.order.config.AlipayConfig;
 import gulimall.order.config.MyRabbitMqConfig;
 import gulimall.order.constant.OrderConstant;
+import gulimall.order.constant.PaymentStatusConstant;
 import gulimall.order.entity.OrderItemEntity;
 import gulimall.common.enume.OrderStatusEnum;
+import gulimall.order.entity.PaymentInfoEntity;
 import gulimall.order.feign.MemberFeignService;
 import gulimall.order.feign.ProductFeignService;
 import gulimall.order.feign.ShoppingCartFeignService;
 import gulimall.order.feign.WareFeignService;
 import gulimall.order.interceptor.LoginUserInterceptor;
 import gulimall.order.service.OrderItemService;
+import gulimall.order.service.PaymentInfoService;
 import gulimall.order.to.OrderCreateTo;
 import gulimall.order.vo.*;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -31,6 +37,8 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -72,10 +80,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private WareFeignService wareFeignService;
 
     @Autowired
+    private AlipayConfig alipayConfig;
+
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @Autowired
     private OrderItemService orderItemService;
+
+    @Autowired
+    private PaymentInfoService paymentInfoService;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -92,7 +106,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<OrderEntity> page = this.page(
                 new Query<OrderEntity>().getPage(params),
-                new QueryWrapper<OrderEntity>()
+                new QueryWrapper<>()
         );
 
         return new PageUtils(page);
@@ -166,7 +180,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         /*异步无返回值执行*/
         CompletableFuture<Void> setIntegration = CompletableFuture.runAsync(() -> {
             //4、保存用户积分
-            orderConfirmVo.setIntegration(memberRespVo.getIntegration());
+            R r = memberFeignService.getInfoById(memberRespVo.getId());
+            MemberRespVo data = r.getData("member", new TypeReference<MemberRespVo>() {
+            });
+            orderConfirmVo.setIntegration(data.getIntegration());
         }, executor);
 
         //5、使用防重令牌
@@ -211,7 +228,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         //lua脚本，返回0代表令牌校验失败，1代表删除成功
         String script = "if redis.call('get',KEYS[1])==ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
         //原子验证和删除令牌
-        Long result = redisTemplate.execute(new DefaultRedisScript<Long>(script, Long.class), Collections.singletonList(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId()), orderToken);
+        Long result = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId()), orderToken);
         if (result != null && result == 1L) {
             //验证通过
             submitOrderResponseVo.setCode(0);
@@ -266,7 +283,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      * @param orderEntity orderEntity
      */
     @Override
-    public void closeOrder(OrderEntity orderEntity) {
+    public void closeOrder(OrderEntity orderEntity) throws AlipayApiException {
         //1、查询当前订单的最新状态
         OrderEntity newOrder = this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderEntity.getOrderSn()));
         if (newOrder != null && newOrder.getStatus().equals(OrderStatusEnum.CREATE_NEW.getCode())) {
@@ -274,7 +291,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             newOrder.setStatus(OrderStatusEnum.CANCLED.getCode());
             this.updateById(newOrder);
 
-            //3、<br>防止网络延迟等问题导致库存服务解锁库存时关闭订单被阻塞或没执行完查询一直是待付款状态，库存一直解锁不了
+            //3、防止支付宝由于网络延迟问题自动收单比我们订单关闭慢了，这里关闭订单时手动调用收单
+            //获取下交易流水号
+            PaymentInfoEntity paymentInfoEntity = paymentInfoService.getOne(new QueryWrapper<PaymentInfoEntity>().eq("order_sn", orderEntity.getOrderSn()));
+            if (paymentInfoEntity != null) {
+                //调用收单方法
+                alipayConfig.alipayTradeClose(paymentInfoEntity.getAlipayTradeNo(), null);
+            } else {
+                //调用收单方法
+                alipayConfig.alipayTradeClose(null, orderEntity.getOrderSn());
+            }
+            //4、<br>再次发送消息确认解锁，防止网络延迟等问题导致库存服务解锁库存时关闭订单被阻塞或没执行完查询一直是待付款状态，库存一直解锁不了
             OrderTo orderTo = new OrderTo();
             BeanUtils.copyProperties(newOrder, orderTo);
             rabbitTemplate.convertAndSend(MyRabbitMqConfig.ORDER_EVENT_EXCHANGE, "ware.dead.order", orderTo, new CorrelationData(UUID.randomUUID().toString()));
@@ -348,6 +375,48 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         } else {
             return null;
         }
+    }
+
+    /**
+     * 根据支付宝返回的支付成功信息，修改订单的状态
+     *
+     * @param payAsyncVo 支付宝通知信息
+     * @return 成功or失败
+     */
+    @Override
+    public Boolean handlePayResult(PayAsyncVo payAsyncVo) throws ParseException {
+        //1、保存交易信息至数据库表
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        PaymentInfoEntity paymentInfoEntity = new PaymentInfoEntity();
+        paymentInfoEntity.setAlipayTradeNo(payAsyncVo.getTrade_no());
+        paymentInfoEntity.setCallbackContent(payAsyncVo.getBody());
+        paymentInfoEntity.setCallbackTime(sdf.parse(payAsyncVo.getNotify_time()));
+        paymentInfoEntity.setCreateTime(sdf.parse(payAsyncVo.getGmt_create()));
+        //查询订单id
+        OrderEntity orderEntity = this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", payAsyncVo.getOut_trade_no()));
+        paymentInfoEntity.setOrderId(orderEntity.getId());
+        paymentInfoEntity.setOrderSn(payAsyncVo.getOut_trade_no());
+        paymentInfoEntity.setPaymentStatus(payAsyncVo.getTrade_status());
+        paymentInfoEntity.setSubject(payAsyncVo.getSubject());
+        paymentInfoEntity.setTotalAmount(new BigDecimal(payAsyncVo.getBuyer_pay_amount()));
+        paymentInfoService.save(paymentInfoEntity);
+
+        if (PaymentStatusConstant.TRADE_SUCCESS.equals(payAsyncVo.getTrade_status()) || PaymentStatusConstant.TRADE_FINISHED.equals(payAsyncVo.getTrade_status())) {
+            //2、支付成功,修改订单状态为已付款
+            String orderSn = payAsyncVo.getOut_trade_no();
+            OrderEntity updateOrderEntity = new OrderEntity();
+            updateOrderEntity.setStatus(OrderStatusEnum.PAYED.getCode());
+            this.update(updateOrderEntity, new UpdateWrapper<OrderEntity>().eq("order_sn", orderSn));
+
+            //3、调用远程服务将下单时所使用的会员积分清零
+            Long memberId = orderEntity.getMemberId();
+            MemberRespVo memberRespVo = new MemberRespVo();
+            memberRespVo.setId(memberId);
+            memberRespVo.setIntegration(0);
+            memberFeignService.updateById(memberRespVo);
+            return true;
+        }
+        return false;
     }
 
     /**

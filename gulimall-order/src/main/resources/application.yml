@@ -104,8 +104,9 @@
 #  alipay-public-key: 支付宝公钥
 #  app-id: 2021000118636676
 #  merchant-private-key: 商户私钥
-#  notify-url: http://xb6cg22x28.52http.net/order/pay/alipay/success
+#  notify-url: http://q740km4v.xiaomy.net/paymentNotifications #该地址必须外网可访问，因为是支付宝给我们发信息(这里使用的是内网穿透)
 #  return-url: http://order.gulimall.com/list.html
 #  sign-type: RSA2
 #  charset: utf-8
 #  gateway-url: https://openapi.alipaydev.com/gateway.do
+#  timeout-express: 30m

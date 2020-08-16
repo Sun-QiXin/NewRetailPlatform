@@ -53,7 +53,7 @@ public class MyRabbitMqConfig {
      */
     @Bean
     public Queue orderDelayQueue() {
-        return QueueBuilder.durable(ORDER_DELAY_QUEUE).ttl(60000).deadLetterExchange(ORDER_EVENT_EXCHANGE).deadLetterRoutingKey(ORDER_DEAD_KEY).build();
+        return QueueBuilder.durable(ORDER_DELAY_QUEUE).ttl(60000 * 30).deadLetterExchange(ORDER_EVENT_EXCHANGE).deadLetterRoutingKey(ORDER_DEAD_KEY).build();
     }
 
     /**
