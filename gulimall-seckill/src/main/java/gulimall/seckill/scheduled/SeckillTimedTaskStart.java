@@ -1,6 +1,8 @@
 package gulimall.seckill.scheduled;
 
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -28,11 +30,11 @@ import org.springframework.stereotype.Component;
  * <br>FileName: SeckillTimedTasks
  * <br>Date: 2020/08/16 16:25:31
  */
-@EnableScheduling
-@EnableAsync
 @Component
 @Slf4j
-public class SeckillTimedTasks {
+public class SeckillTimedTaskStart {
+    @Autowired
+    private RedissonClient redissonClient;
     /**
      * <br>1、Spring中cron表达式由6位组成，不允许第7位的年
      * <br>2、在周几的位置，1-7代表周一到周日或者MON-SUN（quartz中的cron表达式是0-6）
@@ -46,7 +48,7 @@ public class SeckillTimedTasks {
      *     </ul>
      * </li>
      */
-    @Scheduled(cron = "* * * ? * *")
+    @Scheduled(cron = "* * * * 1 ?")
     @Async
     public void test() throws InterruptedException {
         log.info("hello........");
