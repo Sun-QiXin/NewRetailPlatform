@@ -1,14 +1,11 @@
 package gulimall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import gulimall.coupon.entity.SeckillSessionEntity;
 import gulimall.coupon.service.SeckillSessionService;
@@ -31,6 +28,16 @@ public class SeckillSessionController {
     private SeckillSessionService seckillSessionService;
 
     /**
+     * 获取最近三天内的秒杀活动以及每个活动需要上架的商品
+     * @return R
+     */
+    @GetMapping("/latestThreeDaysSession")
+    public R getLatestThreeDaysSessions(){
+        List<SeckillSessionEntity> seckillSessionEntities = seckillSessionService.getLatestThreeDaysSessions();
+        return R.ok().setData(seckillSessionEntities);
+    }
+
+    /**
      * 根据条件进行分页查询
      * @param params 参数
      * @return R
@@ -41,7 +48,6 @@ public class SeckillSessionController {
 
         return R.ok().put("page", page);
     }
-
 
     /**
      * 信息

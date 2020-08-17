@@ -15,18 +15,9 @@ spring:
         group: dev  #表示当前读取的是DEV_GROUP分组下的配置文件，不配置就读取默认分组DEFAULT_GROUP分组
         namespace: 73f48b03-ced8-460d-aab6-9656c3982265 #表示当前读取的是指定命名空间下的配置文件默认是public命名空间
         extension-configs:  #扩展配置，可以使用一些自定义的配置文件
-          - data-id: datasource.yaml
-            group: dev
-            refresh: true
-          - data-id: mybatis-plus.yaml
-            group: dev
-            refresh: true
           - data-id: other.yaml
             group: dev
             refresh: true
           - data-id: redis.yaml
-            group: dev
-            refresh: true
-          - data-id: ThreadPool.yaml
             group: dev
             refresh: true
