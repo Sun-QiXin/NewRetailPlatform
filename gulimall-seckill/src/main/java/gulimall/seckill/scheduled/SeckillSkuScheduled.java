@@ -30,7 +30,7 @@ public class SeckillSkuScheduled {
     /**
      * 上架最近三天的秒杀商品
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0/30 * * * * ?")
     @Async
     public void uploadLatestThreeDaysSeckillSku(){
         log.info("开始上架商品。。。。。。");

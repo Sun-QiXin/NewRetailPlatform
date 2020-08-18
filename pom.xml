@@ -31,6 +31,7 @@
         <module>gulimall-search</module>
         <module>gulimall-auth-server</module>
         <module>gulimall-shopping-cart</module>
+        <module>gulimall-seckill</module>
     </modules>
 
     <!--统一管理jar包版本-->
@@ -49,7 +50,7 @@
         <mybatis.plus.spring.boot.version>3.3.1</mybatis.plus.spring.boot.version>
         <elasticsearch.version>7.8.0</elasticsearch.version>
         <seate.version>1.2.0</seate.version>
-        <nacos.version>1.2.0</nacos.version>
+        <nacos.version>1.3.1</nacos.version>
     </properties>
 
     <!--子模块继承之后，提供作用：锁定版本+子module不用groupId和version-->

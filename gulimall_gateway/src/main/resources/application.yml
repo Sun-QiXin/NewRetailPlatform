@@ -74,3 +74,8 @@ spring:
           uri: lb://gulimall-order #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
           predicates:
             - Host=order.gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-seckill-host
+          uri: lb://gulimall-seckill #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=seckill.gulimall.com  #根据请求头传送的host进行路由

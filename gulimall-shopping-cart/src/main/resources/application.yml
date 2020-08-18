@@ -35,7 +35,7 @@ seata:
     type: nacos
     nacos:
       namespace: 8168949a-6a7a-48ac-b12d-8866fa941b01
-      serverAddr: 192.168.200.199
+      serverAddr: localhost:8848
       group: SEATA_GROUP
       userName: "nacos"
       password: "nacos"
@@ -43,7 +43,7 @@ seata:
     type: nacos
     nacos:
       application: seata-server
-      server-addr: 192.168.200.199
+      server-addr: localhost:8848
       namespace:
       userName: "nacos"
       password: "nacos"

@@ -497,21 +497,47 @@
                 </div>
                 <div class="box-hide" th:text="${item.info.skuSubtitle}">
                 </div>
-                <div class="box-yuyue">
-                    <div class="yuyue-one">
-                        <img src="/static/item/img/7270ffc3baecdd448958f9f5e69cf60f.png" alt=""/> 预约抢购
+
+                <div class="box-yuyue" th:if="${(item.getSeckillSkuVos()==null)}">
+                    <div class="yuyue-one"
+                         th:style="${(item.getSeckillSkuVos()==null)?'width:100%;color: white;text-align: center':''}"
+                         th:text="${(item.getSeckillSkuVos()==null)?'当前商品没有活动奥':''}">
                     </div>
-                    <div class="yuyue-two">
+                </div>
+
+                <div class="box-yuyue" th:each="seckillSkuVo,index:${item.getSeckillSkuVos()}">
+                    <div class="yuyue-one"
+                         th:style="${(item.getSeckillSkuVos()==null)?'width:100%;color: white;text-align: center':''}"
+                    >
+                        <img src="/static/item/img/7270ffc3baecdd448958f9f5e69cf60f.png" alt=""
+                             th:text="${(item.getSeckillSkuVos()==null)?'当前商品没有活动奥':'秒杀活动 '+index.count}">
+                    </div>
+                    <div class="yuyue-two" th:if="${item.getSeckillSkuVos()!=null}">
                         <ul>
                             <li>
                                 <img src="/static/item/img/f64963b63d6e5849977ddd6afddc1db5.png"/>
-                                <span>190103</span> 人预约
+                                <span th:text="${#strings.substring(seckillSkuVo.getStartTime(),5,10)}"></span>
+                                人预约
                             </li>
                             <li>
-                                <img src="/static/item/img/36860afb69afa241beeb33ae86678093.png"/> 预约剩余
-                                <span id="timer">
+                                <img src="/static/item/img/36860afb69afa241beeb33ae86678093.png"/> 开始时间
+                                <span id="timer"
+                                      th:text="${#dates.format(new java.util.Date(seckillSkuVo.getStartTime()))}"></span>
 
-									</span>
+                                <span style="color: white"
+                                      th:if="${#dates.createNow().getTime()>=seckillSkuVo.getStartTime()&&#dates.createNow().getTime()<=seckillSkuVo.getEndTime()}">
+                                    正在抢购...
+                                </span>
+
+                                <span style="color: white"
+                                      th:if="${#dates.createNow().getTime()>seckillSkuVo.getEndTime()}">
+                                    秒杀已结束...
+                                </span>
+
+                                <span style="color: white"
+                                      th:if="${#dates.createNow().getTime()<seckillSkuVo.getStartTime()}">
+                                    预约秒杀...
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -523,8 +549,11 @@
                             <span>￥</span>
                             <span th:text="${#numbers.formatDecimal(item.getInfo().getPrice(),3,2)}"></span>
                         </li>
-                        <li>
-                            预约享资格
+                        <li th:each="seckillSkuVo,index:${item.getSeckillSkuVos()}">
+                            <span style="color: #ff6700;"
+                                  th:if="${#dates.createNow().getTime()>=seckillSkuVo.getStartTime()&&#dates.createNow().getTime()<=seckillSkuVo.getEndTime()}">
+                                <i>当前秒杀价￥<b>[[${#numbers.formatDecimal(seckillSkuVo.getSeckillPrice(),1,2)}]]</b></i>
+                                </span>
                         </li>
                         <li>
                             <a href="">
@@ -1603,7 +1632,7 @@
             xhrFields: {
                 withCredentials: true
             },
-            success:function (shoppingCart){
+            success: function (shoppingCart) {
                 let countType = shoppingCart.countType;
                 $("#showCartCount").html(countType);
             }
