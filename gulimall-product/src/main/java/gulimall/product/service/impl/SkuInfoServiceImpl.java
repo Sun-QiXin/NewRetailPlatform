@@ -5,9 +5,11 @@ import gulimall.common.to.SkuHasStockVo;
 import gulimall.common.utils.R;
 import gulimall.product.entity.SkuImagesEntity;
 import gulimall.product.entity.SpuInfoDescEntity;
+import gulimall.product.feign.SeckillFeignService;
 import gulimall.product.feign.WareFeignService;
 import gulimall.product.service.*;
 
+import gulimall.product.vo.SeckillSkuVo;
 import gulimall.product.vo.SkuItemSaleAttrsVo;
 import gulimall.product.vo.SkuItemVo;
 import gulimall.product.vo.SpuItemBaseGroupAttrsVo;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -52,6 +55,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     private WareFeignService wareFeignService;
+
+    @Autowired
+    private SeckillFeignService seckillFeignService;
 
     @Autowired
     private ThreadPoolExecutor executor;
@@ -124,6 +130,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     /**
      * 根据skuId返回页面需要的商品数据
      * <br>使用异步方式执行
+     *
      * @param skuId skuId
      * @return 商品数据
      */
@@ -179,8 +186,23 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             }
         }, executor);
 
+        /*使用异步编排的方式执行下面代码,由于下面代码不需要该步返回值，所以使用runAsync*/
+        CompletableFuture<Void> seckillFuture = CompletableFuture.runAsync(() -> {
+            //7、远程查询当前商品是否有秒杀活动
+            R r = seckillFeignService.getSkuSeckillInfoById(skuId);
+            if (r.getCode() == 0) {
+                List<SeckillSkuVo> seckillSkuVos = r.getData(new TypeReference<List<SeckillSkuVo>>() {
+                });
+                if (seckillSkuVos != null && seckillSkuVos.size() > 0) {
+                    //将里面对象降序排序
+                    seckillSkuVos.sort(Comparator.comparing(SeckillSkuVo::getStartTime));
+                    skuItemVo.setSeckillSkuVos(seckillSkuVos);
+                }
+            }
+        }, executor);
+
         /*等所有异步任务都完成再返回*/
-        CompletableFuture.allOf(skuInfoFuture, saleAttrFuture, infoDescFuture, groupAttrFuture, imgFuture, wareFuture).get();
+        CompletableFuture.allOf(skuInfoFuture, saleAttrFuture, infoDescFuture, groupAttrFuture, imgFuture, wareFuture, seckillFuture).get();
         return skuItemVo;
     }
 

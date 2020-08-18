@@ -8,9 +8,9 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.200.199 #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos注册中心
+        server-addr: localhost:8848 #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos注册中心
       config:
-        server-addr: 192.168.200.199 #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos配置中心
+        server-addr: localhost:8848  #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos配置中心
         file-extension: yaml #指定配置文件的后缀名
         group: dev  #表示当前读取的是DEV_GROUP分组下的配置文件，不配置就读取默认分组DEFAULT_GROUP分组
         namespace: f404f2b1-094c-465e-b2db-00f7c27e017d #表示当前读取的是指定命名空间下的配置文件默认是public命名空间
