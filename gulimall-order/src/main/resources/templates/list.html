@@ -250,14 +250,14 @@
                                     [[${orderItem.skuAttrsVals}]]</p>
                                 <div><i class="table_i4"></i>找搭配</div>
                             </div>
-                            <div style="margin-left:15px;">x[[${orderItem.skuQuantity}]]</div>
+                            <div style="margin-left:15px;">¥[[${#numbers.formatDecimal(orderItem.skuPrice,1,2)}]] x[[${orderItem.skuQuantity}]]</div>
                             <div style="clear:both"></div>
                         </td>
                         <td th:if="${index.index==0}" th:rowspan="${index.size}">[[${order.receiverName}]] <i><i
                                 class="table_i1"></i></i></td>
                         <td th:if="${index.index==0}" th:rowspan="${index.size}"
                             style="padding-left:10px;color:#AAAAB1;">
-                            <p style="margin-bottom:5px;">总额: [[${order.payAmount}]]</p>
+                            <p style="margin-bottom:5px;">总额: ¥[[${#numbers.formatDecimal(order.payAmount,1,2)}]]</p>
                             <hr style="width:90%;">
                             <p>在线支付</p>
                         </td>

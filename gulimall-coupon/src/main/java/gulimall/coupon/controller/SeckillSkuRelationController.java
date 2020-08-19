@@ -55,10 +55,10 @@ public class SeckillSkuRelationController {
     }
 
     /**
-     * 保存
+     * 保存秒杀活动的商品信息
+     * TODO 保存时需要查询当前商品是否有足够的库存，如果足够就锁定库存，发送mq消息，延时时间为活动的过期时间，过期后路由至解锁库存的死信队列，然后由库存服务处理
      */
     @RequestMapping("/save")
-    //@RequiresPermissions("coupon:seckillskurelation:save")
     public R save(@RequestBody SeckillSkuRelationEntity seckillSkuRelation){
 		seckillSkuRelationService.save(seckillSkuRelation);
 

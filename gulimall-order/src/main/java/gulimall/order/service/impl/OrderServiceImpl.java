@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import gulimall.common.exception.NoStockException;
 import gulimall.common.to.SkuHasStockVo;
 import gulimall.common.to.mq.OrderTo;
+import gulimall.common.to.mq.SeckillOrderTo;
+import gulimall.common.to.mq.SkuInfoTo;
 import gulimall.common.utils.R;
 import gulimall.common.vo.MemberRespVo;
 import gulimall.common.vo.ShoppingCart;
@@ -233,7 +235,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             //验证通过
             submitOrderResponseVo.setCode(0);
             //2、创建订单、订单项等信息
-            OrderCreateTo orderCreateTo = createOrder();
+            OrderCreateTo orderCreateTo = createOrder(null);
 
             //3、保存订单至数据库
             this.saveOrder(orderCreateTo);
@@ -420,6 +422,77 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     }
 
     /**
+     * 保存秒杀的订单信息
+     *
+     * @param seckillOrderTo seckillOrderTo
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void createSeckillOrder(SeckillOrderTo seckillOrderTo) {
+        //获取用户的信息保存至threadLocal，创建订单需要获取使用
+        R member = memberFeignService.getInfoById(seckillOrderTo.getMemberId());
+        MemberRespVo memberRespVo = member.getData("member", new TypeReference<MemberRespVo>() {
+        });
+        LoginUserInterceptor.threadLocal.set(memberRespVo);
+
+        //1、构建提交订单的基本信息
+        OrderSubmitVo orderSubmitVo = new OrderSubmitVo();
+        //根据会员id获取其默认收货地址
+        List<MemberAddressVo> addresses = memberFeignService.getAddresses(seckillOrderTo.getMemberId());
+        for (MemberAddressVo address : addresses) {
+            if (address.getDefaultStatus() == 1) {
+                orderSubmitVo.setAddressId(address.getId());
+            }
+        }
+        orderSubmitVo.setIntegrationAmount(new BigDecimal(0));
+        orderSubmitVo.setPayPrice(seckillOrderTo.getSeckillPrice());
+        orderSubmitVo.setPayType(1);
+        orderSubmitVo.setTotalAmount(seckillOrderTo.getSeckillPrice().multiply(new BigDecimal(seckillOrderTo.getSeckillCount())));
+        orderSubmitVoThreadLocal.set(orderSubmitVo);
+
+        //2、创建订单等信息
+        OrderCreateTo orderCreateTo = createOrder(seckillOrderTo.getOrderSn());
+        //2.1、由于，没有经过购物车所以需要单独设置订单项
+        ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
+        SkuInfoTo skuInfoTo = seckillOrderTo.getSkuInfoTo();
+        shoppingCartItem.setPrice(seckillOrderTo.getSeckillPrice());
+        shoppingCartItem.setCheck(true);
+        shoppingCartItem.setCount(seckillOrderTo.getSeckillCount());
+        shoppingCartItem.setImage(skuInfoTo.getSkuDefaultImg());
+        //远程查询商品套餐值
+        List<String> attrValues = productFeignService.getSkuSaleAttrValues(seckillOrderTo.getSkuId());
+        shoppingCartItem.setSkuAttr(attrValues);
+        shoppingCartItem.setSkuId(seckillOrderTo.getSkuId());
+        shoppingCartItem.setTitle(skuInfoTo.getSkuName());
+        OrderItemEntity orderItemEntity = buildOrderItemEntity(shoppingCartItem);
+        orderItemEntity.setOrderSn(seckillOrderTo.getOrderSn());
+        orderCreateTo.setOrderItemEntities(Collections.singletonList(orderItemEntity));
+
+        //3、保存订单至数据库
+        this.saveOrder(orderCreateTo);
+
+        //4、远程锁定库存,有异常回滚订单数据
+        WareSkuLockVo wareSkuLockVo = new WareSkuLockVo();
+        List<OrderItemVo> itemVos = orderCreateTo.getOrderItemEntities().stream().map(item -> {
+            OrderItemVo orderItemVo = new OrderItemVo();
+            orderItemVo.setSkuId(item.getSkuId());
+            orderItemVo.setCount(item.getSkuQuantity());
+            orderItemVo.setTitle(item.getSkuName());
+            return orderItemVo;
+        }).collect(Collectors.toList());
+        wareSkuLockVo.setOrderItemVos(itemVos);
+        wareSkuLockVo.setOrderSn(orderCreateTo.getOrderEntity().getOrderSn());
+        R r = wareFeignService.orderLockStock(wareSkuLockVo);
+        if (r.getCode() == 0) {
+            //订单创建成功，给mq发送创建成功的消息
+            rabbitTemplate.convertAndSend(MyRabbitMqConfig.ORDER_EVENT_EXCHANGE, MyRabbitMqConfig.ORDER_DELAY_KEY, orderCreateTo.getOrderEntity(), new CorrelationData(UUID.randomUUID().toString()));
+        } else {
+            //锁定失败,抛出异常
+            throw new NoStockException(r.get("msg").toString());
+        }
+    }
+
+    /**
      * 保存订单数据至数据库
      *
      * @param orderCreateTo orderCreateTo
@@ -443,10 +516,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      *
      * @return orderCreateTo
      */
-    private OrderCreateTo createOrder() {
+    private OrderCreateTo createOrder(String orderSn) {
+        //如果事先指定了订单号就用事先指定的，没指定就自动生成
+        if (!StringUtils.isEmpty(orderSn)) {
+            OrderCreateTo orderCreateTo = new OrderCreateTo();
+            //1、构建订单
+            OrderEntity orderEntity = buildOrderEntity(orderSn);
+            orderCreateTo.setOrderEntity(orderEntity);
+
+            //2、构建购物项
+            List<OrderItemEntity> orderItemEntities = buildOrderItemEntities(orderSn);
+            orderCreateTo.setOrderItemEntities(orderItemEntities);
+
+            return orderCreateTo;
+        }
+
         OrderCreateTo orderCreateTo = new OrderCreateTo();
         //1、构建订单
-        OrderEntity orderEntity = buildOrderEntity();
+        OrderEntity orderEntity = buildOrderEntity(null);
         orderCreateTo.setOrderEntity(orderEntity);
 
         //2、构建购物项
@@ -461,11 +548,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      *
      * @return orderEntity
      */
-    private OrderEntity buildOrderEntity() {
+    private OrderEntity buildOrderEntity(String orderSn) {
         MemberRespVo memberRespVo = LoginUserInterceptor.threadLocal.get();
         OrderEntity orderEntity = new OrderEntity();
-        //1、生成一个订单号
-        String orderSn = IdWorker.getTimeId();
+        if (StringUtils.isEmpty(orderSn)) {
+            //1、如果没传递订单号就生成一个订单号
+            orderSn = IdWorker.getTimeId();
+        }
         orderEntity.setOrderSn(orderSn);
 
         //2、获取并设置收货地址信息
@@ -535,18 +624,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      */
     private List<OrderItemEntity> buildOrderItemEntities(String orderSn) {
         ShoppingCart shoppingCart = shoppingCartFeignService.getCurrentUserShoppingCart();
-        return shoppingCart.getItems().stream()
-                //过滤出当前选中的购物项
-                .filter(ShoppingCartItem::getCheck)
-                .map(item -> {
-                    //远程查询商品服务,更新为现在的最新价格
-                    BigDecimal currentPrice = productFeignService.currentPrice(item.getSkuId());
-                    item.setPrice(currentPrice);
-                    //将数据封装到我们指定的vo
-                    OrderItemEntity orderItemEntity = buildOrderItemEntity(item);
-                    orderItemEntity.setOrderSn(orderSn);
-                    return orderItemEntity;
-                }).collect(Collectors.toList());
+        if (shoppingCart.getItems() != null) {
+            return shoppingCart.getItems().stream()
+                    //过滤出当前选中的购物项
+                    .filter(ShoppingCartItem::getCheck)
+                    .map(item -> {
+                        //远程查询商品服务,更新为现在的最新价格
+                        BigDecimal currentPrice = productFeignService.currentPrice(item.getSkuId());
+                        item.setPrice(currentPrice);
+                        //将数据封装到我们指定的vo
+                        OrderItemEntity orderItemEntity = buildOrderItemEntity(item);
+                        orderItemEntity.setOrderSn(orderSn);
+                        return orderItemEntity;
+                    }).collect(Collectors.toList());
+        }
+        return null;
     }
 
     /**

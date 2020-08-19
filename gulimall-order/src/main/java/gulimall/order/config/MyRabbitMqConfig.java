@@ -24,6 +24,10 @@ public class MyRabbitMqConfig {
      */
     public static final String ORDER_DELAY_QUEUE = "order.delay.queue";
     /**
+     * 秒杀队列名称
+     */
+    public static final String ORDER_SECKILL_QUEUE = "order.seckill.queue";
+    /**
      * 死信队列名称
      */
     public static final String ORDER_DEAD_QUEUE = "order.dead.queue";
@@ -31,6 +35,10 @@ public class MyRabbitMqConfig {
      * 路由到延时队列使用的路由键
      */
     public static final String ORDER_DELAY_KEY = "order.create.order";
+    /**
+     * 路由到秒杀队列使用的路由键
+     */
+    public static final String ORDER_SECKILL_KEY = "order.seckill.order";
     /**
      * 路由到死信队列使用的路由键
      */
@@ -54,6 +62,17 @@ public class MyRabbitMqConfig {
     @Bean
     public Queue orderDelayQueue() {
         return QueueBuilder.durable(ORDER_DELAY_QUEUE).ttl(60000 * 30).deadLetterExchange(ORDER_EVENT_EXCHANGE).deadLetterRoutingKey(ORDER_DEAD_KEY).build();
+    }
+
+
+    /**
+     * 创建一个秒杀队列
+     *
+     * @return 秒杀队列
+     */
+    @Bean
+    public Queue orderSeckillQueue() {
+        return QueueBuilder.durable(ORDER_SECKILL_QUEUE).build();
     }
 
     /**
@@ -94,5 +113,17 @@ public class MyRabbitMqConfig {
     @Bean
     public Binding bindingWareDeadQueue() {
         return new Binding("ware.dead.queue", Binding.DestinationType.QUEUE, ORDER_EVENT_EXCHANGE, "ware.dead.#", null);
+    }
+
+
+    /**
+     *
+     * 将交换机与秒杀队列绑定
+     *
+     * @return Binding
+     */
+    @Bean
+    public Binding bindingSeckillQueue() {
+        return new Binding(ORDER_SECKILL_QUEUE, Binding.DestinationType.QUEUE, ORDER_EVENT_EXCHANGE, "order.seckill.order", null);
     }
 }

@@ -1,6 +1,7 @@
 package gulimall.seckill.to;
 
 
+import gulimall.common.to.mq.SkuInfoTo;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author 孙启新
@@ -42,4 +43,13 @@ public interface ProductFeignService {
      */
     @RequestMapping("/product/brand/info/{brandId}")
     R getBrandInfoById(@PathVariable("brandId") Long brandId);
+
+
+    /**
+     * 根据skuId获取销售属性值
+     * @param skuId skuId
+     * @return List<String>
+     */
+    @GetMapping("/product/skusaleattrvalue/stringList/{skuId}")
+    List<String> getSkuSaleAttrValues(@PathVariable("skuId") Long skuId);
 }
