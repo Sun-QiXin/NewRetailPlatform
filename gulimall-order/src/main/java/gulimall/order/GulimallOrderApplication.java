@@ -14,7 +14,6 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableDiscoveryClient
 @EnableFeignClients
 @EnableRabbit
-@EnableRedisHttpSession //使用redis作为session存储
 public class GulimallOrderApplication {
 
     public static void main(String[] args) {

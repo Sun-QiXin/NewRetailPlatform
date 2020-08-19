@@ -1,5 +1,6 @@
 package gulimall.seckill.service;
 
+import gulimall.common.to.mq.SeckillOrderTo;
 import gulimall.seckill.to.SeckillSkuRedisTo;
 
 import java.util.List;
@@ -27,4 +28,13 @@ public interface SeckillService {
      * @return R
      */
     List<SeckillSkuRedisTo> getSkuSeckillInfoById(Long skuId);
+
+    /**
+     * 秒杀商品加入购物车
+     * @param seckillId 商品在redis中的key
+     * @param num 数量
+     * @param code 随机码
+     * @return 订单数据
+     */
+    SeckillOrderTo seckill(String seckillId, String num, String code);
 }

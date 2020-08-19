@@ -12,6 +12,11 @@ spring:
   thymeleaf:
     cache: false #关闭页面缓存
 
+  session:
+    store-type: redis #指定使用redis来保存session数据
+    redis:
+      namespace: spring:session #存储的命名空间
+
   task:
     execution:
       pool:
@@ -19,6 +24,20 @@ spring:
         max-size: 200 #最大线程数
         queue-capacity: 10000 #队列最大容纳数
 
+  #配置RabbitMQ
+  rabbitmq:
+    host: 192.168.200.132
+    port: 5672
+    virtual-host: /gulimall #虚拟主机名称
+    username: admin
+    password: 362623
+    publisher-confirm-type: simple  #开启消息发送到服务端确认回调
+    publisher-returns: true #开启消息抵达队列返回回调
+    template:
+      mandatory: true #只要抵达队列，以异步发送优先回调我们这个returnConfirm
+    listener:
+      simple:
+        acknowledge-mode: manual  #开始手动确认消息
 
 #打印sql日志
 logging:

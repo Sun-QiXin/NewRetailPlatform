@@ -1,4 +1,4 @@
-package gulimall.seckill.to;
+package gulimall.common.to.mq;
 
 import lombok.Data;
 

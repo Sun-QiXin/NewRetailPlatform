@@ -2,6 +2,7 @@ package gulimall.order.service;
 
 import com.alipay.api.AlipayApiException;
 import com.baomidou.mybatisplus.extension.service.IService;
+import gulimall.common.to.mq.SeckillOrderTo;
 import gulimall.common.utils.PageUtils;
 import gulimall.order.entity.OrderEntity;
 import gulimall.order.vo.*;
@@ -81,5 +82,11 @@ public interface OrderService extends IService<OrderEntity> {
      * @return 成功or失败
      */
     Boolean handlePayResult(PayAsyncVo payAsyncVo) throws ParseException;
+
+    /**
+     * 保存秒杀的订单信息
+     * @param seckillOrderTo seckillOrderTo
+     */
+    void createSeckillOrder(SeckillOrderTo seckillOrderTo);
 }
 

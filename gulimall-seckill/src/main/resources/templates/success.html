@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <title>加入购物车</title>
+    <title>秒杀成功页面</title>
     <script type="text/javascript" src="/static/cart/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="/static/cart/bootstrap/js/bootstrap.js"></script>
     <script type="text/javascript" src="/static/cart/js/swiper.min.js"></script>
@@ -10,7 +10,20 @@
     <link rel="stylesheet" type="text/css" href="/static/cart/css/swiper.min.css"/>
     <link rel="stylesheet" type="text/css" href="/static/cart/bootstrap/css/bootstrap.css"/>
     <link rel="stylesheet" type="text/css" href="/static/cart/css/success.css"/>
-
+    <style>
+        .err-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            overflow: hidden;
+            background-image: url("/static/cart/img/错误.png");
+            background-size: cover;
+        }
+    </style>
 </head>
 
 <body>
@@ -61,10 +74,7 @@
                 <input id="searchInput" type="text" placeholder="输入商品名"/>
                 <button id="searchBtn">搜索</button>
             </div>
-
-
         </div>
-
     </div>
 </div>
 
@@ -75,32 +85,47 @@
             <div class="m succeed-box">
                 <div class="mc success-cont">
                     <div class="success-lcol">
-                        <div class="success-top"><b class="succ-icon"></b>
-                            <h3 class="ftx-02">商品已成功加入购物车</h3></div>
-                        <div class="p-item">
+                        <div class="success-top" th:if="${seckillErrorMsg!=null}">
+                            <b class="err-icon"></b>
+                            <h3 class="ftx-02" style="color: red;width: 100%;text-align: center"
+                                th:text="${seckillErrorMsg}">商品已成功加入购物车</h3>
+                        </div>
+                        <div class="success-top" th:if="${seckillSuccessMsg!=null}"><b class="succ-icon"></b>
+                            <h3 class="ftx-02" th:text="${seckillSuccessMsg}">
+                                商品已成功加入购物车</h3>
+                        </div>
+                        <div class="p-item" th:if="${seckillOrderTo!=null}">
                             <div class="p-img">
-                                <a href="javascript:;" target="_blank"><img style="height: 60px;width:60px;" th:src="${shoppingCartItem?.getImage()}"></a>
+                                <a href="javascript:" target="_blank"><img style="height: 60px;width:60px;"
+                                                                           th:src="${seckillOrderTo?.getSkuInfoTo()?.getSkuDefaultImg()}"></a>
                             </div>
                             <div class="p-info">
                                 <div class="p-name">
-                                    <a th:href="'http://item.gulimall.com/'+${shoppingCartItem?.getSkuId()}+'.html'"
-                                       th:text="${shoppingCartItem?.getTitle()}">TCL 55A950C 55英寸32核人工智能 HDR曲面超薄4K电视金属机身（枪色）</a>
+                                    <a th:href="'http://item.gulimall.com/'+${seckillOrderTo?.getSkuInfoTo()?.getSkuId()}+'.html'"
+                                       th:text="${seckillOrderTo?.getSkuInfoTo()?.getSkuName()}">TCL 55A950C 55英寸32核人工智能
+                                        HDR曲面超薄4K电视金属机身（枪色）</a>
                                 </div>
-                                <div class="p-extra"><span class="txt" th:text="'数量：'+${shoppingCartItem?.getCount()}">  数量：1</span></div>
+                                <div class="p-extra"><span class="txt"
+                                                           th:text="'¥'+${seckillOrderTo?.getSeckillPrice()}"></span>
+                                </div>
+                                <div class="p-extra"><span class="txt"
+                                                           th:text="'x'+${seckillOrderTo?.getSeckillCount()}">  数量：1</span>
+                                </div>
                             </div>
                             <div class="clr"></div>
                         </div>
                     </div>
-                    <div class="success-btns success-btns-new">
+                    <div class="success-btns success-btns-new" th:if="${seckillOrderTo!=null}">
                         <div class="success-ad">
                             <a href="/#none"></a>
                         </div>
                         <div class="clr"></div>
                         <div class="bg_shop">
                             <a class="btn-tobback"
-                               th:href="'http://item.gulimall.com/'+${shoppingCartItem?.getSkuId()}+'.html'">查看商品详情</a>
-                            <a class="btn-addtocart" href="http://cart.gulimall.com/cartList.html"
-                               id="GotoShoppingCart"><b></b>去购物车结算</a>
+                               th:href="'http://item.gulimall.com/'+${seckillOrderTo?.getSkuInfoTo()?.getSkuId()}+'.html'">查看商品详情</a>
+                            <button disabled class="btn-addtocart"
+                                    id="GotoaliPay"><b></b>去支付宝结算
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -119,6 +144,29 @@
         $("#searchBtn").click(function search() {
             let searchValue = $("#searchInput").val();
             location.href = "http://search.gulimall.com/list.html?keyword=" + searchValue;
+        });
+
+        /**
+         * 10秒后才可以点击按钮去结算
+         */
+        $("#GotoaliPay").css({
+            "cursor": "wait",
+            "outline": "none"
+        });
+        setTimeout(() => {
+            $("#GotoaliPay").removeAttr("disabled");
+            $("#GotoaliPay").css({
+                "cursor": "pointer",
+                "background":"green",
+                "border":"1px solid green"
+            });
+        }, 10000)
+
+        /**
+         * 去支付宝结算
+         */
+        $("#GotoaliPay").click(function (){
+            location.href=`http://order.gulimall.com/payOrder/[[${seckillOrderTo?.getOrderSn()}]]`;
         })
     })
 </script>
