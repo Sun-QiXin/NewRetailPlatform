@@ -23,18 +23,25 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- http相关依赖 -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+
         <!--SpringCloud集成gateway起步依赖-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
-        <!--热部署依赖-->
+        <!-- SpringBoot健康监控功能起步依赖  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!--SpringBoot单元测试依赖-->

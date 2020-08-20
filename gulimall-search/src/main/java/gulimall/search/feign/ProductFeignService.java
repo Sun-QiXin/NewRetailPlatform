@@ -1,6 +1,7 @@
 package gulimall.search.feign;
 
 import gulimall.common.utils.R;
+import gulimall.search.feign.fallback.ProductFeignServiceFallbackHandleImpl;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * <br>Date: 2020/07/13 12:02:08
  */
 @Component
-@FeignClient("gulimall-product")
+@FeignClient(value = "gulimall-product", fallback = ProductFeignServiceFallbackHandleImpl.class)
 public interface ProductFeignService {
     /**
      * 获取属性信息
+     *
      * @param attrId 属性id
      * @return 属性的详细信息
      */

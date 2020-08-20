@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 /**
@@ -32,6 +31,18 @@ public class SeckillController {
     public R getCurrentSeckillSkus() {
         List<SeckillSkuRedisTo> skuRedisTos = seckillService.getCurrentSeckillSkus();
         return R.ok().setData(skuRedisTos);
+    }
+
+
+    /**
+     * tesxt
+     *
+     * @return 秒杀商品
+     */
+    @GetMapping("/test")
+    @ResponseBody
+    public R getCurrentSeckillSkus1() {
+        return R.ok();
     }
 
     /**

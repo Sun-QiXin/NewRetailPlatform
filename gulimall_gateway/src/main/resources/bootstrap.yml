@@ -14,3 +14,16 @@ spring:
         file-extension: yaml #指定配置文件的后缀名
         group: dev  #表示当前读取的是DEV_GROUP分组下的配置文件，不配置就读取默认分组DEFAULT_GROUP分组
         namespace: cca8aea7-5c4e-4874-843e-276d7dc529e5 #表示当前读取的是指定命名空间下的配置文件默认是public命名空间
+        extension-configs:
+          - data-id: gulimall_gateway.yaml
+            group: dev
+            refresh: true
+          - data-id: sentinel.yaml
+            group: dev
+            refresh: true
+          - data-id: other.yaml
+            group: dev
+            refresh: true
+          - data-id: feign.yaml
+            group: dev
+            refresh: true

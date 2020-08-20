@@ -31,6 +31,26 @@ public enum BizCodeEnume {
      */
     SMS_CODE_EXCEPTION(10002,"短信验证码频率太高，请稍后再试"),
     /**
+     * 限流异常
+     */
+    SENTINEL_FLOW_EXCEPTION(10003,"请求流量过大"),
+    /**
+     * 降级异常
+     */
+    SENTINEL_DEGRADE_EXCEPTION(10004,"服务暂时不可用"),
+    /**
+     * 参数热点异常
+     */
+    SENTINEL_PARAM_FLOW_EXCEPTION(10005,"参数热点异常"),
+    /**
+     * 系统异常
+     */
+    SENTINEL_SYSTEM_BLOCK_EXCEPTION(10006,"系统规则（负载。。）不满足规则"),
+    /**
+     * 授权异常
+     */
+    SENTINEL_AUTHORITY_EXCEPTION(10007,"授权规则不通过"),
+    /**
      * 用户已经存在
      */
     USERNAME_EXIST_EXCEPTION(15001,"用户已经存在"),

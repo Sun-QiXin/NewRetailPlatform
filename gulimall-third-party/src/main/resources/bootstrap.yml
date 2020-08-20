@@ -24,3 +24,12 @@ spring:
           - data-id: Seata.yaml
             group: dev
             refresh: true
+          - data-id: sentinel.yaml
+            group: dev
+            refresh: true
+          - data-id: other.yaml
+            group: dev
+            refresh: true
+          - data-id: feign.yaml
+            group: dev
+            refresh: true

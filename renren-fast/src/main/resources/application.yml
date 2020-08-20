@@ -4,7 +4,7 @@ server:
     uri-encoding: UTF-8
     max-threads: 1000
     min-spare-threads: 30
-  port: 8080
+  port: 8081
   connection-timeout: 5000ms
   servlet:
     context-path: /renren-fast
@@ -13,6 +13,10 @@ spring:
   application:
     name: renern-fast
   cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080  #sentinel控制台地址
+        port: 8719  #指定应用与Sentinel控制台交互的端口，应用本地会起一个该端口占用的HttpServer,#默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口
     nacos:
       discovery:
         server-addr: localhost:8848 #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos注册中心
@@ -32,7 +36,7 @@ spring:
   redis:
     open: false  # 是否开启redis缓存  true开启   false关闭
     database: 0
-    host: localhost
+    host: 192.168.200.132
     port: 6379
     password:    # 密码（默认为空）
     timeout: 6000ms  # 连接超时时长（毫秒）

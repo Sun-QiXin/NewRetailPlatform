@@ -1,5 +1,6 @@
 package gulimall.auth.feign;
 
+import gulimall.auth.feign.fallback.ThirdPartyFeignServiceFallbackHandleImpl;
 import gulimall.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * <br>Date: 2020/08/02 09:22:33
  */
 @Component
-@FeignClient("gulimall-third-party")
+@FeignClient(value = "gulimall-third-party", fallback = ThirdPartyFeignServiceFallbackHandleImpl.class)
 public interface ThirdPartyFeignService {
 
     /**

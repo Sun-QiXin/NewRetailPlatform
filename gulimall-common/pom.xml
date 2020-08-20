@@ -27,6 +27,24 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
+        <!--SpringCloudAlibaba的sentinel,流量控制、熔断降级等-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+
+        <!--sentinel配置在nacos持久化依赖-->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-datasource-nacos</artifactId>
+        </dependency>
+
+        <!--Sentinel 提供与 Servlet 的整合，可以对 Web 请求进行流量控制-->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-web-servlet</artifactId>
+        </dependency>
+
         <!--json转化工具-->
         <dependency>
             <groupId>com.alibaba</groupId>

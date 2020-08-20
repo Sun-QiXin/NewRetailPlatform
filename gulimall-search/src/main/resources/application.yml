@@ -1,6 +1,12 @@
 #以下配置全部是从nacos配置中心读取的
 
 spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080  #sentinel控制台地址
+        port: 8719  #指定应用与Sentinel控制台交互的端口，应用本地会起一个该端口占用的HttpServer,#默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口
+
   #关闭页面缓存
   thymeleaf:
     cache: false
@@ -40,3 +46,13 @@ seata:
       namespace:
       userName: "nacos"
       password: "nacos"
+
+#暴露所有端点,actuator健康监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+feign:
+  sentinel:
+    enabled: true #开启feign对sentinel的支持

@@ -159,6 +159,11 @@
 			<artifactId>commons-io</artifactId>
 			<version>${commons.io.version}</version>
 		</dependency>
+        <!-- SpringBoot健康监控功能起步依赖  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>

@@ -1,6 +1,7 @@
 package gulimall.order.feign;
 
 import gulimall.common.utils.R;
+import gulimall.order.feign.fallback.WareFeignServiceFallbackHandleImpl;
 import gulimall.order.vo.WareSkuLockVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.util.List;
  * <br>Date: 2020/08/09 16:08:01
  */
 @Component
-@FeignClient("gulimall-ware")
+@FeignClient(value = "gulimall-ware", fallback = WareFeignServiceFallbackHandleImpl.class)
 public interface WareFeignService {
 
     /**
@@ -30,6 +31,7 @@ public interface WareFeignService {
 
     /**
      * 根据传来的数据锁定某件商品的库存
+     *
      * @param wareSkuLockVo wareSkuLockVo
      * @return R
      */
