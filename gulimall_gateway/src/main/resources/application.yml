@@ -3,6 +3,11 @@
 
 spring:
   cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080  #sentinel控制台地址
+        port: 8719  #指定应用与Sentinel控制台交互的端口，应用本地会起一个该端口占用的HttpServer,#默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口
+
     gateway:
       discovery:
         locator:
@@ -79,3 +84,13 @@ spring:
           uri: lb://gulimall-seckill #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
           predicates:
             - Host=seckill.gulimall.com  #根据请求头传送的host进行路由
+
+#暴露所有端点,actuator健康监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+feign:
+  sentinel:
+    enabled: true #开启feign对sentinel的支持

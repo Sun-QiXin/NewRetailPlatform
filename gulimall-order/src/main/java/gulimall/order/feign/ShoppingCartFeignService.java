@@ -1,6 +1,7 @@
 package gulimall.order.feign;
 
 import gulimall.common.vo.ShoppingCart;
+import gulimall.order.feign.fallback.ShoppingCartFeignServiceFallbackHandleImpl;
 import gulimall.order.vo.MemberAddressVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
@@ -16,13 +17,12 @@ import java.util.concurrent.ExecutionException;
  * <br>Date: 2020/08/09 10:38:17
  */
 @Component
-@FeignClient("gulimall-shopping-cart")
+@FeignClient(value = "gulimall-shopping-cart", fallback = ShoppingCartFeignServiceFallbackHandleImpl.class)
 public interface ShoppingCartFeignService {
     /**
      * 获取当前登录用户的购物车数据返回
+     *
      * @return ShoppingCart
-     * @throws ExecutionException ExecutionException
-     * @throws InterruptedException InterruptedException
      */
     @GetMapping("/currentUserShoppingCart")
     ShoppingCart getCurrentUserShoppingCart();

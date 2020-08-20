@@ -1,6 +1,6 @@
 #当前服务端口号
 server:
-  port: 10000
+  port: 10001
 
 spring:
   application:
@@ -40,5 +40,11 @@ spring:
             group: dev
             refresh: true
           - data-id: Seata.yaml
+            group: dev
+            refresh: true
+          - data-id: sentinel.yaml
+            group: dev
+            refresh: true
+          - data-id: feign.yaml
             group: dev
             refresh: true

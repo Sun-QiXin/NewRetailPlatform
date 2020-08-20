@@ -134,7 +134,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             //1、远程查询当前用户的收货地址列表
             /*这个远程调用是不需要请求头的,所以不用同步*/
             List<MemberAddressVo> addresses = memberFeignService.getAddresses(memberRespVo.getId());
-            orderConfirmVo.setAddressVos(addresses);
+            if (addresses != null && addresses.size() > 0) {
+                orderConfirmVo.setAddressVos(addresses);
+            }
         }, executor);
 
         /*异步无返回值执行*/
@@ -145,19 +147,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             //将主线程request数据同步到该线程
             RequestContextHolder.setRequestAttributes(requestAttributes);
             ShoppingCart shoppingCart = shoppingCartFeignService.getCurrentUserShoppingCart();
-            //过滤出当前选中的购物项
-            List<OrderItemVo> orderItemVos = shoppingCart.getItems().stream()
-                    .filter(ShoppingCartItem::getCheck)
-                    .map(item -> {
-                        //远程查询商品服务,更新为现在的最新价格
-                        BigDecimal currentPrice = productFeignService.currentPrice(item.getSkuId());
-                        item.setPrice(currentPrice);
-                        //将数据封装到我们指定的vo
-                        OrderItemVo orderItemVo = new OrderItemVo();
-                        BeanUtils.copyProperties(item, orderItemVo);
-                        return orderItemVo;
-                    }).collect(Collectors.toList());
-            orderConfirmVo.setOrderItemVos(orderItemVos);
+            if (shoppingCart != null) {
+                //过滤出当前选中的购物项
+                List<OrderItemVo> orderItemVos = shoppingCart.getItems().stream()
+                        .filter(ShoppingCartItem::getCheck)
+                        .map(item -> {
+                            //远程查询商品服务,更新为现在的最新价格
+                            BigDecimal currentPrice = productFeignService.currentPrice(item.getSkuId());
+                            item.setPrice(currentPrice);
+                            //将数据封装到我们指定的vo
+                            OrderItemVo orderItemVo = new OrderItemVo();
+                            BeanUtils.copyProperties(item, orderItemVo);
+                            return orderItemVo;
+                        }).collect(Collectors.toList());
+                orderConfirmVo.setOrderItemVos(orderItemVos);
+            }
         }, executor).thenRunAsync(() -> {
             //3、远程批量查询库存信息,并封装进orderItemVos
             List<OrderItemVo> orderItemVos = orderConfirmVo.getOrderItemVos();
@@ -183,9 +187,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         CompletableFuture<Void> setIntegration = CompletableFuture.runAsync(() -> {
             //4、保存用户积分
             R r = memberFeignService.getInfoById(memberRespVo.getId());
-            MemberRespVo data = r.getData("member", new TypeReference<MemberRespVo>() {
-            });
-            orderConfirmVo.setIntegration(data.getIntegration());
+            if (r.getCode() == 0) {
+                MemberRespVo data = r.getData("member", new TypeReference<MemberRespVo>() {
+                });
+                orderConfirmVo.setIntegration(data.getIntegration());
+            }
         }, executor);
 
         //5、使用防重令牌

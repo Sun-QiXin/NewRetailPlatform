@@ -3,6 +3,7 @@ package gulimall.product.feign;
 import gulimall.common.to.SkuReductionTo;
 import gulimall.common.to.SpuBoundTo;
 import gulimall.common.utils.R;
+import gulimall.product.feign.fallback.CouponFeignServiceFallbackHandleImpl;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * <br>Date: 2020/07/13 12:02:08
  */
 @Component
-@FeignClient("gulimall-coupon")
+@FeignClient(value = "gulimall-coupon",fallback = CouponFeignServiceFallbackHandleImpl.class)
 public interface CouponFeignService {
     /**
      * <br>保存spu的积分信息；gulimall_sms->sms_spu_bounds

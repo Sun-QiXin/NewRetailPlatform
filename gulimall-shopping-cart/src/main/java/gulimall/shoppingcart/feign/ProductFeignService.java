@@ -1,6 +1,7 @@
 package gulimall.shoppingcart.feign;
 
 import gulimall.common.utils.R;
+import gulimall.shoppingcart.feign.fallback.ProductFeignServiceFallbackHandleImpl;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +15,13 @@ import java.util.List;
  * <br>FileName: ProductFeignService
  * <br>Date: 2020/08/05 15:26:26
  */
-@FeignClient("gulimall-product")
+@FeignClient(value = "gulimall-product", fallback = ProductFeignServiceFallbackHandleImpl.class)
 @Component
 public interface ProductFeignService {
 
     /**
      * 根据skuId查询商品信息
+     *
      * @param skuId 商品skuId
      * @return r对象
      */
@@ -28,6 +30,7 @@ public interface ProductFeignService {
 
     /**
      * 根据skuId获取销售属性值
+     *
      * @param skuId skuId
      * @return List<String>
      */

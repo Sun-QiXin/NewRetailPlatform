@@ -1,5 +1,6 @@
 package gulimall.auth.feign;
 
+import gulimall.auth.feign.fallback.MemberFeignServiceFallbackHandleImpl;
 import gulimall.auth.vo.SocialUserVo;
 import gulimall.auth.vo.UserLoginVo;
 import gulimall.auth.vo.UserRegisterVo;
@@ -11,12 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 远程调用member服务
+ *
  * @author 孙启新
  * <br>FileName: MemberFeignService
  * <br>Date: 2020/08/02 13:42:12
  */
 @Component
-@FeignClient("gulimall-member")
+@FeignClient(value = "gulimall-member", fallback = MemberFeignServiceFallbackHandleImpl.class)
 public interface MemberFeignService {
 
     /**
@@ -27,8 +29,10 @@ public interface MemberFeignService {
      */
     @PostMapping("/member/member/register")
     R register(@RequestBody UserRegisterVo userRegisterVo);
+
     /**
      * 登录用户
+     *
      * @param userLoginVo 登录信息
      * @return R对象
      */
@@ -37,6 +41,7 @@ public interface MemberFeignService {
 
     /**
      * 社交登录
+     *
      * @param socialUserVo 登录信息
      * @return R对象
      */
