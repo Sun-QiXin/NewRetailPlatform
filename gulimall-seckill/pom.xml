@@ -36,7 +36,9 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!--springSession使用redis来完成session共享-->
+        <!--springSession使用redis来完成session共享
+        特别注意：spring-session中间件需要依赖redis2.8.0以上版本，
+        并且需要开启：notify-keyspace-events  gxE;(重要)-->
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>

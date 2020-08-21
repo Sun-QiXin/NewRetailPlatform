@@ -51,3 +51,6 @@ spring:
           - data-id: feign.yaml
             group: dev
             refresh: true
+          - data-id: zipkin-sleuth.yaml
+            group: dev
+            refresh: true

@@ -23,6 +23,12 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!--alibaba的Sentinel集成gateway网关-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
+        </dependency>
+
         <!-- http相关依赖 -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -30,7 +36,6 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
-
 
         <!--SpringCloud集成gateway起步依赖-->
         <dependency>

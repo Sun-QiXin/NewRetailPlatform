@@ -34,16 +34,6 @@ public class MyRabbitMqGlobalConfig {
     private MqMessageService mqMessageService;
 
     /**
-     * 将默认序列化机制设置json
-     *
-     * @return Jackson2JsonMessageConverter
-     */
-    @Bean
-    public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
-
-    /**
      * 自定义RabbitTempLate,保证消息的可靠性,将失败的消息记录到数据库,定时任务重发
      * <br>1、服务收到消息就回调
      * <br>1)spring.rabbitmq.publisher-confirm-type: simple
