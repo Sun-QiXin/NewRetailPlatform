@@ -18,11 +18,20 @@ spring:
     host: 192.168.200.132
     port: 6379
 
+  zipkin:
+    base-url: http://192.168.200.132:9411 #zipkin服务器地址
+    discovery-client-enabled: false #关闭服务发现,否则SpringCloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用web的方式传送数据
+  sleuth:
+    sampler:
+      probability: 1 #设置抽样采集率为100%,默认0.1即10%
+
 #打印sql日志
 logging:
   level:
     gulimall:
-      product:
+      shoppingcart:
         dao: debug
 
 #配置我们自定义的线程池参数，想在配置文件中获得提示需要引入spring-boot-configuration-processor依赖

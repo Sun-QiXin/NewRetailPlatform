@@ -22,34 +22,42 @@
 #        skin: 13
 #        appcode: *
 
-seata:
-  enabled: true
-  application-id: gulimall-third-party #服务唯一id,使用当前服务名称即可
-  tx-service-group: gulimall-third-party-group #service.vgroupMapping后面跟着的名字
-  enable-auto-data-source-proxy: true #自动数据源代理
-  config: #配置中心的相关配置
-    type: nacos
-    nacos:
-      namespace: 8168949a-6a7a-48ac-b12d-8866fa941b01
-      serverAddr: localhost:8848
-      group: SEATA_GROUP
-      userName: "nacos"
-      password: "nacos"
-  registry: #注册中心相关配置
-    type: nacos
-    nacos:
-      application: seata-server
-      server-addr: localhost:8848
-      namespace:
-      userName: "nacos"
-      password: "nacos"
-
-#暴露所有端点,actuator健康监控
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
-feign:
-  sentinel:
-    enabled: true #开启feign对sentinel的支持
+#  zipkin:
+#    base-url: http://192.168.200.132:9411 #zipkin服务器地址
+#    discovery-client-enabled: false #关闭服务发现,否则SpringCloud会把zipkin的url当做服务名称
+#    sender:
+#      type: web #设置使用web的方式传送数据
+#  sleuth:
+#    sampler:
+#      probability: 1 #设置抽样采集率为100%,默认0.1即10%
+#seata:
+#  enabled: true
+#  application-id: gulimall-third-party #服务唯一id,使用当前服务名称即可
+#  tx-service-group: gulimall-third-party-group #service.vgroupMapping后面跟着的名字
+#  enable-auto-data-source-proxy: true #自动数据源代理
+#  config: #配置中心的相关配置
+#    type: nacos
+#    nacos:
+#      namespace: 8168949a-6a7a-48ac-b12d-8866fa941b01
+#      serverAddr: localhost:8848
+#      group: SEATA_GROUP
+#      userName: "nacos"
+#      password: "nacos"
+#  registry: #注册中心相关配置
+#    type: nacos
+#    nacos:
+#      application: seata-server
+#      server-addr: localhost:8848
+#      namespace:
+#      userName: "nacos"
+#      password: "nacos"
+#
+##暴露所有端点,actuator健康监控
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'
+#feign:
+#  sentinel:
+#    enabled: true #开启feign对sentinel的支持

@@ -45,6 +45,12 @@
             <artifactId>sentinel-web-servlet</artifactId>
         </dependency>
 
+        <!--分布式请求链路追踪可视化界面zipkin+分布式请求链路追踪sleuth-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
+
         <!--json转化工具-->
         <dependency>
             <groupId>com.alibaba</groupId>

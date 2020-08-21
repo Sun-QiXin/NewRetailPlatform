@@ -58,7 +58,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
-@EnableRedisHttpSession //使用redis作为session存储
 public class GulimallProductApplication {
 
     public static void main(String[] args) {
