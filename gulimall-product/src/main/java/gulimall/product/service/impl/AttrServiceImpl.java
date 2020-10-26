@@ -1,7 +1,7 @@
 package gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import gulimall.constant.ProductConstant;
+import gulimall.common.constant.ProductConstant;
 import gulimall.product.entity.AttrAttrgroupRelationEntity;
 import gulimall.product.entity.AttrGroupEntity;
 import gulimall.product.entity.CategoryEntity;
@@ -31,7 +31,6 @@ import gulimall.product.dao.AttrDao;
 import gulimall.product.entity.AttrEntity;
 import gulimall.product.service.AttrService;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Attr;
 
 
 @Service("attrService")
@@ -176,7 +175,12 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
             relationEntity.setAttrGroupId(attr.getAttrGroupId());
             relationEntity.setAttrId(attr.getAttrId());
-            attrAttrgroupRelationService.update(relationEntity, new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId()));
+            Integer count = attrAttrgroupRelationService.count(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId()));
+            if (count > 0) {
+                attrAttrgroupRelationService.update(relationEntity, new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId()));
+            } else {
+                attrAttrgroupRelationService.save(relationEntity);
+            }
         }
 
     }

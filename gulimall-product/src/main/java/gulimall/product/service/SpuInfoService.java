@@ -2,7 +2,9 @@ package gulimall.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import gulimall.common.utils.PageUtils;
+import gulimall.product.entity.SpuInfoDescEntity;
 import gulimall.product.entity.SpuInfoEntity;
+import gulimall.product.vo.SpuSaveVo;
 
 import java.util.Map;
 
@@ -15,6 +17,23 @@ import java.util.Map;
  */
 public interface SpuInfoService extends IService<SpuInfoEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    /**
+     * 多表保存
+     * @param spuSaveVo
+     */
+    void saveSpuInfo(SpuSaveVo spuSaveVo);
+
+    /**
+     * 保存spu基本信息
+     * @param spuInfoEntity
+     */
+    void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity);
+
+    /**
+     * 按照多条件进行查询
+     * @param params
+     * @return
+     */
+    PageUtils queryPageByCondition(Map<String, Object> params);
 }
 

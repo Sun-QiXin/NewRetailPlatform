@@ -9,6 +9,14 @@ spring:
     username: root
     password: 362623
     url: jdbc:mysql://192.168.200.131:3306/gulimall_pms?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+  cloud:
+    alicloud:
+      access-key: LTAI4G54hfpNXrx3vFNEPtm9  #生成的Accesskey子用户信息
+      secret-key: F9reY09hSuIwPfSyQgQdZbPNtA6zHH
+      oss:
+        endpoint: http://oss-cn-qingdao.aliyuncs.com  #开通的oss服务的外网访问地址
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss #指定返回日期的格式
 
 #配置mybatis-plus
 mybatis-plus:
