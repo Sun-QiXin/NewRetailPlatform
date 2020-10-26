@@ -1,0 +1,67 @@
+#以下配置全部是从nacos配置中心读取的
+
+
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080  #sentinel控制台地址
+        port: 8719  #指定应用与Sentinel控制台交互的端口，应用本地会起一个该端口占用的HttpServer,#默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口
+
+  session:
+    store-type: redis #指定使用redis来保存session数据
+    redis:
+      namespace: spring:session #存储的命名空间
+  thymeleaf:
+    cache: false #关闭页面缓存
+  redis:    #配置redis
+    host: 192.168.200.132
+    port: 6379
+
+  zipkin:
+    base-url: http://192.168.200.132:9411 #zipkin服务器地址
+    discovery-client-enabled: false #关闭服务发现,否则SpringCloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用web的方式传送数据
+  sleuth:
+    sampler:
+      probability: 1 #设置抽样采集率为100%,默认0.1即10%
+
+#打印sql日志
+logging:
+  level:
+    gulimall:
+      auth:
+        dao: debug
+
+seata:
+  enabled: true
+  application-id: gulimall-auth-server #服务唯一id,使用当前服务名称即可
+  tx-service-group: gulimall-auth-server-group #service.vgroupMapping后面跟着的名字
+  enable-auto-data-source-proxy: true #自动数据源代理
+  config: #配置中心的相关配置
+    type: nacos
+    nacos:
+      namespace: 8168949a-6a7a-48ac-b12d-8866fa941b01
+      serverAddr: localhost:8848
+      group: SEATA_GROUP
+      userName: "nacos"
+      password: "nacos"
+  registry: #注册中心相关配置
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: localhost:8848
+      namespace:
+      userName: "nacos"
+      password: "nacos"
+
+#暴露所有端点,actuator健康监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+feign:
+  sentinel:
+    enabled: true #开启feign对sentinel的支持

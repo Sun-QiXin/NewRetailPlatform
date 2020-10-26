@@ -1,0 +1,104 @@
+#以下配置全部是从nacos配置中心读取的
+
+
+spring:
+  zipkin:
+    base-url: http://192.168.200.132:9411 #zipkin服务器地址
+    discovery-client-enabled: false #关闭服务发现,否则SpringCloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用web的方式传送数据
+  sleuth:
+    sampler:
+      probability: 1 #设置抽样采集率为100%,默认0.1即10%
+
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080  #sentinel控制台地址
+        port: 8719  #指定应用与Sentinel控制台交互的端口，应用本地会起一个该端口占用的HttpServer,#默认8719，假如被占用了会自动从8719开始依次+1扫描。直至找到未被占用的端口
+    gateway:
+      discovery:
+        locator:
+          enabled: true  #开启从注册中心动态创建路由的功能，利用微服务名进行路由
+      routes: #路由路径精确的要向前放
+        - id: gulimall-product
+          uri: lb://gulimall-product  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Path=/api/product/**   #断言,路径相匹配的进行路由
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment}  #重写路径
+
+        - id: gulimall-third-party
+          uri: lb://gulimall-third-party   #gulimall-third-party服务
+          predicates:
+            - Path=/api/thirdparty/**   #前端项目发起的请求单独带api
+          filters:
+            - RewritePath=/api/thirdparty/(?<segment>.*), /$\{segment}  #重写路径
+
+        - id: gulimall-coupon
+          uri: lb://gulimall-coupon   #gulimall-third-party服务
+          predicates:
+            - Path=/api/coupon/**   #前端项目发起的请求单独带api
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment}  #重写路径
+
+        - id: gulimall-member
+          uri: lb://gulimall-member   #gulimall-member服务
+          predicates:
+            - Path=/api/member/**   #前端项目发起的请求单独带api路径
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment}  #重写路径
+
+        - id: gulimall-ware
+          uri: lb://gulimall-ware   #gulimall-ware服务
+          predicates:
+            - Path=/api/ware/**   #前端项目发起的请求单独带api路径
+          filters:
+            - RewritePath=/api/(?<segment>.*), /$\{segment}  #重写路径
+
+        - id: renern-fast
+          uri: lb://renern-fast   #renren-fast服务
+          predicates:
+            - Path=/api/**   #前端项目发起的请求只带api路径则默认路由到renern-fast
+          filters:
+            - RewritePath=/api/(?<segment>.*), /renren-fast/$\{segment}  #重写路径带上/renren-fast
+
+        - id: gulimall-product-host
+          uri: lb://gulimall-product  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=gulimall.com,item.gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-search-host
+          uri: lb://gulimall-search  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=search.gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-auth-host
+          uri: lb://gulimall-auth-server  #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=auth.gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-shopping-cart-host
+          uri: lb://gulimall-shopping-cart #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=cart.gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-order-host
+          uri: lb://gulimall-order #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=order.gulimall.com  #根据请求头传送的host进行路由
+
+        - id: gulimall-seckill-host
+          uri: lb://gulimall-seckill #匹配后提供服务的路由地址,服务名称(lb开头，则会开启负载均衡)
+          predicates:
+            - Host=seckill.gulimall.com  #根据请求头传送的host进行路由
+
+#暴露所有端点,actuator健康监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+feign:
+  sentinel:
+    enabled: true #开启feign对sentinel的支持

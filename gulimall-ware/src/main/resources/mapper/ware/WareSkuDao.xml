@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="gulimall.ware.dao.WareSkuDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="gulimall.ware.entity.WareSkuEntity" id="wareSkuMap">
+        <result property="id" column="id"/>
+        <result property="skuId" column="sku_id"/>
+        <result property="wareId" column="ware_id"/>
+        <result property="stock" column="stock"/>
+        <result property="skuName" column="sku_name"/>
+        <result property="stockLocked" column="stock_locked"/>
+    </resultMap>
+
+    <!--将成功采购的进行入库-->
+    <update id="addStock">
+        UPDATE wms_ware_sku
+        SET stock = stock + #{skuNum}
+        WHERE sku_id = #{skuId}
+          AND ware_id = #{wareId};
+    </update>
+
+    <!--查询当前sku的库存量-->
+    <select id="getSkuStock" resultType="java.lang.Long">
+        SELECT SUM(stock-stock_locked) FROM wms_ware_sku
+        <where>
+            sku_id = #{skuId}
+        </where>
+    </select>
+
+    <!--根据SkuId查出该商品在哪些仓库有库存-->
+    <select id="listWareIdHasSkuStock" resultType="java.lang.Long">
+        SELECT ware_id
+        FROM wms_ware_sku
+        WHERE sku_id = #{skuId}
+          AND (stock - stock_locked) > 0
+    </select>
+
+    <!--锁定库存-->
+    <update id="lockSkuStock">
+        UPDATE wms_ware_sku
+        SET stock_locked = (stock_locked + #{num})
+        WHERE sku_id = #{skuId}
+          AND ware_id = #{wareId}
+          AND stock - stock_locked >= #{num}
+    </update>
+
+    <!--操作数据库解锁库存-->
+    <update id="unLockStock">
+        UPDATE wms_ware_sku
+        SET stock_locked = stock_locked - #{orderTaskDetailEntity.skuNum}
+        WHERE sku_id = #{orderTaskDetailEntity.skuId}
+          AND ware_id = #{orderTaskDetailEntity.wareId}
+    </update>
+</mapper>

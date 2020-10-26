@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.1.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>gulimall</groupId>
+    <artifactId>gulimall</artifactId>
+    <version>1.0.0</version>
+    <name>gulimall</name>
+    <description>聚合服务</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>gulimall-coupon</module>
+        <module>gulimall-ware</module>
+        <module>gulimall-product</module>
+        <module>gulimall-order</module>
+        <module>gulimall-member</module>
+        <module>renren-fast</module>
+        <module>renren-generator</module>
+        <module>gulimall-common</module>
+        <module>gulimall_gateway</module>
+        <module>gulimall-third-party</module>
+        <module>gulimall-search</module>
+        <module>gulimall-auth-server</module>
+        <module>gulimall-shopping-cart</module>
+        <module>gulimall-seckill</module>
+    </modules>
+
+    <!--统一管理jar包版本-->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <spring-cloud.version>Hoxton.SR6</spring-cloud.version>
+        <junit.version>4.12</junit.version>
+        <log4j.version>1.2.17</log4j.version>
+        <lombok.version>1.18.12</lombok.version>
+        <mysql.version>8.0.20</mysql.version>
+        <druid.version>1.1.22</druid.version>
+        <mybatis.spring.boot.version>2.1.3</mybatis.spring.boot.version>
+        <mybatis.plus.spring.boot.version>3.3.1</mybatis.plus.spring.boot.version>
+        <elasticsearch.version>7.8.0</elasticsearch.version>
+        <spring.cloud.alibaba.version>2.2.1.RELEASE</spring.cloud.alibaba.version>
+        <spring.cloud.alibaba.seata.version>2.2.0.RELEASE</spring.cloud.alibaba.seata.version>
+        <spring.cloud.alibaba.oss.version>2.2.0.RELEASE</spring.cloud.alibaba.oss.version>
+        <seate.version>1.2.0</seate.version>
+        <nacos.version>1.3.1</nacos.version>
+    </properties>
+
+    <!--子模块继承之后，提供作用：锁定版本+子module不用groupId和version-->
+    <dependencyManagement>
+        <dependencies>
+            <!--SpringCloud依赖-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!--SpringCloud alibaba 依赖-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring.cloud.alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.alibaba.nacos</groupId>
+                        <artifactId>nacos-client</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--重新指定nacos-client的版本,低版本会出现连接超时等错误虽然不影响使用-->
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+
+            <!--SpringCloudAlibaba的seata分布式事务管理(注意与安装的seata版本一致)
+            目前只有2.2.0版本，不能使用spring-cloud-alibaba-dependencies进行统一版本，需要手动设置版本号-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-seata</artifactId>
+                <version>${spring.cloud.alibaba.seata.version}</version>
+            </dependency>
+            <!--指定与安装的seata客户端版本一致，重要！-->
+            <dependency>
+                <groupId>io.seata</groupId>
+                <artifactId>seata-spring-boot-starter</artifactId>
+                <version>${seate.version}</version>
+            </dependency>
+
+            <!--SpringCloudAlibaba的oss对象存储
+            目前只有2.2.0版本，不能使用spring-cloud-alibaba-dependencies进行统一版本，需要手动设置版本号-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+                <version>${spring.cloud.alibaba.oss.version}</version>
+            </dependency>
+
+            <!--MySQL驱动-->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+
+            <!--阿里Druid连接池-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <!--MyBatis集成SpringBoot框架起步依赖-->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.spring.boot.version}</version>
+            </dependency>
+
+            <!--MyBatis-Plus集成SpringBoot框架起步依赖-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis.plus.spring.boot.version}</version>
+            </dependency>
+
+            <!--单元测试依赖-->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+
+            <!--提供一系列方便生成get、set方法等的注解依赖-->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <optional>true</optional>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!--自动热部署插件-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.3.1.RELEASE</version>
+                <configuration>
+                    <fork>true</fork>
+                    <addResources>true</addResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

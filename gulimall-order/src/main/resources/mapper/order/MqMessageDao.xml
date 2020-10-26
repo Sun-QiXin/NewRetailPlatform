@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gulimall.order.dao.MqMessageDao">
+
+    <!--mq_message的映射结果集-->
+    <resultMap type="gulimall.order.entity.MqMessageEntity" id="MqMessageMap">
+        <result property="messageId" column="message_id" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="toExchane" column="to_exchane" jdbcType="VARCHAR"/>
+        <result property="routingKey" column="routing_key" jdbcType="VARCHAR"/>
+        <result property="classType" column="class_type" jdbcType="VARCHAR"/>
+        <result property="messageStatus" column="message_status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--全部字段-->
+    <sql id="allColumn"> message_id, content, to_exchane, routing_key, class_type, message_status, create_time, update_time </sql>
+
+    <!--添加语句的字段列表-->
+    <sql id="insertColumn">
+        <if test="content != null and content != ''">
+            content,
+        </if>
+        <if test="toExchane != null and toExchane != ''">
+            to_exchane,
+        </if>
+        <if test="routingKey != null and routingKey != ''">
+            routing_key,
+        </if>
+        <if test="classType != null and classType != ''">
+            class_type,
+        </if>
+        <if test="messageStatus != null">
+            message_status,
+        </if>
+        <if test="createTime != null">
+            create_time,
+        </if>
+        <if test="updateTime != null">
+            update_time,
+        </if>
+    </sql>
+
+    <!--添加语句的值列表-->
+    <sql id="insertValue">
+        <if test="content != null and content != ''">
+            #{content},
+        </if>
+        <if test="toExchane != null and toExchane != ''">
+            #{toExchane},
+        </if>
+        <if test="routingKey != null and routingKey != ''">
+            #{routingKey},
+        </if>
+        <if test="classType != null and classType != ''">
+            #{classType},
+        </if>
+        <if test="messageStatus != null">
+            #{messageStatus},
+        </if>
+        <if test="createTime != null">
+            #{createTime},
+        </if>
+        <if test="updateTime != null">
+            #{updateTime},
+        </if>
+    </sql>
+
+    <!--通用对MqMessage各个属性的值的非空判断-->
+    <sql id="commonsValue">
+        <if test="content != null and content != ''">
+            content = #{content},
+        </if>
+        <if test="toExchane != null and toExchane != ''">
+            to_exchane = #{toExchane},
+        </if>
+        <if test="routingKey != null and routingKey != ''">
+            routing_key = #{routingKey},
+        </if>
+        <if test="classType != null and classType != ''">
+            class_type = #{classType},
+        </if>
+        <if test="messageStatus != null">
+            message_status = #{messageStatus},
+        </if>
+        <if test="createTime != null">
+            create_time = #{createTime},
+        </if>
+        <if test="updateTime != null">
+            update_time = #{updateTime},
+        </if>
+    </sql>
+
+
+</mapper>

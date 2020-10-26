@@ -1,0 +1,53 @@
+#当前服务端口号
+server:
+  port: 10001
+
+spring:
+  application:
+    name: gulimall-product #当前服务名称
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos注册中心
+      config:
+        server-addr: localhost:8848 #通过虚拟IP访问Nginx主服务器，然后反向代理到其中一台nacos配置中心
+        file-extension: yaml #指定配置文件的后缀名
+        group: dev  #表示当前读取的是DEV_GROUP分组下的配置文件，不配置就读取默认分组DEFAULT_GROUP分组
+        namespace: 91f58f64-53bc-4958-8c8b-f5e27361103a #表示当前读取的是指定命名空间下的配置文件默认是public命名空间
+        extension-configs:  #扩展配置，可以使用一些自定义的配置文件
+          - data-id: datasource.yaml
+            group: dev
+            refresh: true
+          - data-id: mybatis-plus.yaml
+            group: dev
+            refresh: true
+          - data-id: other.yaml
+            group: dev
+            refresh: true
+          - data-id: alibabaOSS.yaml
+            group: dev
+            refresh: true
+          - data-id: redis.yaml
+            group: dev
+            refresh: true
+          - data-id: SpringCache.yaml
+            group: dev
+            refresh: true
+          - data-id: ThreadPool.yaml
+            group: dev
+            refresh: true
+          - data-id: springSession.yaml
+            group: dev
+            refresh: true
+          - data-id: Seata.yaml
+            group: dev
+            refresh: true
+          - data-id: sentinel.yaml
+            group: dev
+            refresh: true
+          - data-id: feign.yaml
+            group: dev
+            refresh: true
+          - data-id: zipkin-sleuth.yaml
+            group: dev
+            refresh: true
