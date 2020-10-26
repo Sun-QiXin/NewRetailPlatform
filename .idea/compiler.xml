@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="gulimall-coupon" />
+        <module name="gulimall-common" />
+        <module name="gulimall-auth-server" />
+        <module name="gulimall-order" />
+        <module name="gulimall-seckill" />
+        <module name="renren-generator" />
+        <module name="gulimall-product" />
+        <module name="gulimall-shopping-cart" />
+        <module name="gulimall-third-party" />
+        <module name="gulimall_gateway" />
+        <module name="renren-fast" />
+        <module name="gulimall-search" />
+        <module name="gulimall-member" />
+        <module name="gulimall-ware" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="gulimall" target="1.8" />
+      <module name="gulimall-auth-server" target="1.8" />
+      <module name="gulimall-common" target="1.8" />
+      <module name="gulimall-coupon" target="1.8" />
+      <module name="gulimall-member" target="1.8" />
+      <module name="gulimall-order" target="1.8" />
+      <module name="gulimall-product" target="1.8" />
+      <module name="gulimall-search" target="1.8" />
+      <module name="gulimall-seckill" target="1.8" />
+      <module name="gulimall-shopping-cart" target="1.8" />
+      <module name="gulimall-third-party" target="1.8" />
+      <module name="gulimall-ware" target="1.8" />
+      <module name="gulimall_gateway" target="1.8" />
+      <module name="renren-fast" target="1.8" />
+      <module name="renren-generator" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="gulimall-auth-server" options="-parameters" />
+      <module name="gulimall-common" options="-parameters" />
+      <module name="gulimall-coupon" options="-parameters" />
+      <module name="gulimall-member" options="-parameters" />
+      <module name="gulimall-order" options="-parameters" />
+      <module name="gulimall-product" options="-parameters" />
+      <module name="gulimall-search" options="-parameters" />
+      <module name="gulimall-seckill" options="-parameters" />
+      <module name="gulimall-shopping-cart" options="-parameters" />
+      <module name="gulimall-third-party" options="-parameters" />
+      <module name="gulimall-ware" options="-parameters" />
+      <module name="gulimall_gateway" options="-parameters" />
+      <module name="renren-fast" options="-parameters" />
+      <module name="renren-generator" options="-parameters" />
+    </option>
+  </component>
+</project>
