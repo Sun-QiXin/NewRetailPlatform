@@ -13,7 +13,7 @@ import java.util.Date;
  * (MqMessage)表实体类
  *
  * @author @孙启新
- * @since 2020-08-13 16:26:06
+ * @since 2020-11-13 16:26:06
  */
 @SuppressWarnings("serial")
 @TableName("mq_message")

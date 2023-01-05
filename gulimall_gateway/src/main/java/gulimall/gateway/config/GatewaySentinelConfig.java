@@ -30,7 +30,7 @@ import static org.springframework.web.reactive.function.BodyInserters.fromValue;
  *
  * @author 孙启新
  * <br>FileName: SeckillSentinelConfig
- * <br>Date: 2020/08/20 12:27:50
+ * <br>Date: 2020/10/20 12:27:50
  */
 @Configuration
 public class GatewaySentinelConfig {

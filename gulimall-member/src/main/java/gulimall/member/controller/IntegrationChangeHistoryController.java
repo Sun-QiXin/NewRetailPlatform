@@ -22,7 +22,7 @@ import gulimall.common.utils.R;
  *
  * @author SunQiXin
  * @email 15153869872@163.com
- * @date 2020-07-13 10:29:48
+ * @date 2020-11-13 10:29:48
  */
 @RestController
 @RequestMapping("member/integrationchangehistory")

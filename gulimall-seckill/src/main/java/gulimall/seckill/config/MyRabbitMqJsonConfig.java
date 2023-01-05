@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author 孙启新
  * <br>FileName: MyRabbitMqGlobalConfig
- * <br>Date: 2020/08/07 14:41:44
+ * <br>Date: 2020/11/07 14:41:44
  */
 @Configuration
 public class MyRabbitMqJsonConfig {

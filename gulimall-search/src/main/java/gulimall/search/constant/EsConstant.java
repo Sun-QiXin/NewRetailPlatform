@@ -7,7 +7,7 @@ import lombok.Data;
  *
  * @author 孙启新
  * <br>FileName: EsConstant
- * <br>Date: 2020/07/25 16:39:47
+ * <br>Date: 2020/11/25 16:39:47
  */
 public class EsConstant {
     public static final String PRODUCT_INDEX = "gulimall_product";

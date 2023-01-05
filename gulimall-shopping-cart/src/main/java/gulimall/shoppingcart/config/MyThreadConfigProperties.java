@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * 线程池的参数配置
  * @author 孙启新
  * <br>FileName: MyThreadConfigProperties
- * <br>Date: 2020/08/01 10:48:53
+ * <br>Date: 2020/11/01 10:48:53
  */
 @Component
 @ConfigurationProperties(prefix = "gulimall.thread")

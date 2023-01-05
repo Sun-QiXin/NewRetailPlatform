@@ -22,7 +22,7 @@ import gulimall.common.utils.R;
  *
  * @author SunQiXin
  * @email 15153869872@163.com
- * @date 2020-07-13 09:59:22
+ * @date 2020-11-13 09:59:22
  */
 @RestController
 @RequestMapping("coupon/couponspucategoryrelation")
