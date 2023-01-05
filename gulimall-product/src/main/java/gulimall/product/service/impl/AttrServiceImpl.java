@@ -74,10 +74,9 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     /**
      * 分页根据条件查询列表
-     *
      * @param params
      * @param catelogId
-     * @param type
+     * @param type 类型
      * @return
      */
     @Override
